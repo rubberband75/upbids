@@ -1,13 +1,13 @@
 {
-  "name": "next-auth-typescript-example",
-  "version": "0.0.0",
+  "name": "upbids",
+  "version": "0.0.1",
   "private": true,
-  "description": "An example project for NextAuth.js using Typescript",
-  "repository": "https://github.com/nextauthjs/next-auth-typescript-example.git",
+  "description": "A platfrom to manage silent charity auctions",
+  "repository": "https://github.com/UpBids/upbids.git",
   "bugs": {
-    "url": "https://github.com/nextauthjs/next-auth/issues"
+    "url": "https://github.com/UpBids/upbids/issues"
   },
-  "homepage": "http://next-auth-typescript-example.now.sh",
+  "homepage": "https://upbids.net",
   "main": "",
   "scripts": {
     "dev": "next",
@@ -15,11 +15,7 @@
     "start": "next start",
     "types": "tsc --noEmit"
   },
-  "author": "Lluis Agusti <lluis@hey.com>",
-  "contributors": [
-    "Balázs Orbán <info@balazsorban.com>",
-    "Iain Collins <me@iaincollins.com>"
-  ],
+  "author": "Chandler Childs <ch@ndlerchilds.net>",
   "license": "ISC",
   "prettier": {
     "semi": false

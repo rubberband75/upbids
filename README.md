@@ -1,22 +1,4 @@
-<p align="center">
-   <br/>
-   <a href="https://next-auth.js.org" target="_blank"><img width="150px" src="https://next-auth.js.org/img/logo/logo-sm.png" /></a>
-   <h3 align="center">NextAuth.js Typescript  <img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Typescript_logo_2020.svg" width="40" height="24" alt="TypeScript logo"/> Example App</h3>
-   <p align="center">
-   Open Source. Full Stack. Own Your Data.
-   </p>
-   <p align="center" style="align: center;">
-      <a href="https://npm.im/next-auth">
-        <img alt="npm" src="https://img.shields.io/npm/v/next-auth?color=green&label=next-auth">
-      </a>
-      <a href="https://bundlephobia.com/result?p=next-auth-typescript-example">
-        <img src="https://img.shields.io/bundlephobia/minzip/next-auth?label=next-auth" alt="Bundle Size"/>
-      </a>
-      <a href="https://www.npmtrends.com/next-auth">
-        <img src="https://img.shields.io/npm/dm/next-auth?label=next-auth%20downloads" alt="Downloads" />
-      </a>
-   </p>
-</p>
+# UpBids
 
 ## Overview
 

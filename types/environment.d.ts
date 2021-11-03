@@ -18,7 +18,9 @@ namespace NodeJS {
     GOOGLE_SECRET: string
     TWITTER_ID: string
     TWITTER_SECRET: string
-    DATABASE_URL: string
+    MONGODB_URI: string
+    MONGODB_DATABASE: string
+    SENDGRID_API_KEY: string
     SECRET: string
   }
 }

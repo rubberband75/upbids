@@ -13,6 +13,7 @@ export default async function auth(req, res) {
     adapter: MongoDBAdapter({
       db: (await clientPromise).db(database)
     }),
+    // database: process.env.MONGODB_URI,
     providers: [
       EmailProvider({
         server: process.env.EMAIL_SERVER,
@@ -27,6 +28,7 @@ export default async function auth(req, res) {
         clientId: process.env.FACEBOOK_ID,
         clientSecret: process.env.FACEBOOK_SECRET,
       })
-    ]
+    ],
+    secret: process.env.SECRET,
   })
 }

@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next"
 import type { Session } from "next-auth"
-import { useSession, getSession } from "next-auth/client"
+import { useSession, getSession } from "next-auth/react"
 import Layout from "../components/layout"
 
 export default function Page() {

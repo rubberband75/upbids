@@ -22,5 +22,8 @@ namespace NodeJS {
     MONGODB_DATABASE: string
     SENDGRID_API_KEY: string
     SECRET: string
+    CLOUDINARY_NAME: string
+    CLOUDINARY_API_KEY: string
+    CLOUDINARY_API_SECRET: string
   }
 }

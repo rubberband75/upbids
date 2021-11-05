@@ -112,3 +112,6 @@ dist
 # Lock files
 yarn.lock
 package-lock.json
+
+# PM2 Config
+ecosystem.config.js

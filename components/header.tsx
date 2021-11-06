@@ -65,6 +65,30 @@ export default function Header() {
       <nav>
         <ul className={styles.navItems}>
           <li className={styles.navItem}>
+            <Link href="/account">
+              <a>My Account</a>
+            </Link>
+          </li>
+          <li className={styles.navItem}>
+            <Link href="/auctions">
+              <a>My Auctions</a>
+            </Link>
+          </li>
+          <li className={styles.navItem}>
+            <Link href="/bids">
+              <a>My Bids</a>
+            </Link>
+          </li>
+          <li className={styles.navItem}>
+            <Link href="/discover">
+              <a>Discover Auctions</a>
+            </Link>
+          </li>
+        </ul>
+      </nav>
+      {/* <nav>
+        <ul className={styles.navItems}>
+          <li className={styles.navItem}>
             <Link href="/">
               <a>Home</a>
             </Link>
@@ -90,7 +114,7 @@ export default function Header() {
             </Link>
           </li>
         </ul>
-      </nav>
+      </nav> */}
     </header>
   )
 }

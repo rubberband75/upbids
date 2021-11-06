@@ -5,7 +5,8 @@ import packageInfo from "../package.json"
 export default function Footer() {
   return (
     <footer className={styles.footer}>
-      <hr />
+      Copyright © 2021 Chandler Childs. All rights reserved. 
+      {/* <hr />
       <ul className={styles.navItems}>
         <li className={styles.navItem}>
           <a href="https://next-auth.js.org">Documentation</a>
@@ -24,7 +25,7 @@ export default function Footer() {
         <li className={styles.navItem}>
           <em>next-auth@{packageInfo.dependencies["next-auth"]}</em>
         </li>
-      </ul>
+      </ul> */}
     </footer>
   )
 }

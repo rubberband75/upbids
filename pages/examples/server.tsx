@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next"
 import type { Session } from "next-auth"
 import { useSession, getSession } from "next-auth/react"
-import Layout from "../components/layout"
+import Layout from "../../components/layout"
 
 export default function Page() {
   // As this page uses Server Side Rendering, the `session` will be already

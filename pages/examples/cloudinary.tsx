@@ -1,4 +1,4 @@
-import Layout from "../components/layout"
+import Layout from "../../components/layout"
 import { CloudinaryContext, Image, Transformation } from "cloudinary-react"
 
 export default function Page() {

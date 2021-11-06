@@ -8,15 +8,16 @@ const user = new Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     image: {
         type: String,
-        required: true
+        required: false
     },
     emailVerified: {
-        type: Boolean,
-        required: true
+        type: Date,
+        required: false
     }
 });
 

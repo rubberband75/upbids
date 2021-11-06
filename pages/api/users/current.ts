@@ -5,17 +5,13 @@ import User from "../../../models/user"
 import Session from "../../../models/session"
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // const session = await getSession({ req })
+  const session = await getSession({ req })
 
-  let userJson:any[] = []
+  // let userJson:any[] = []
+// 
+  // let users = await User.find()
 
-  let users = await User.find()
-  for (let i = 0; i < users.length; i++) {
-    let session = await Session.find({ userId: users[i]._id })
-    userJson.push({...users[i]._doc, session})    
-  }
-
-  res.json(userJson)
+  res.json(session)
 }
 
 export default connectDB(handler)

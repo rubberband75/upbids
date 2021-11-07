@@ -28,3 +28,62 @@ iframe {
   border-radius: .5rem;
   filter: invert(1);
 }
+
+fieldset {
+  border-radius: 15px;
+}
+
+input[type=text], input[type=email], input[type=tel] {
+  font-family: -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-size: 1em;
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+
+label {
+  color: #333;
+  font-weight: 300;
+}
+
+input[type=button], input[type=submit], input[type=reset],
+button[type=button], button[type=submit], button[type=reset] {
+  background-color: #2d50ec;
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.profilePicture {
+  border-radius: 5px;
+  float: left;
+  height: 16em;
+  width: 16em;
+  display: block;
+  background-color: #f7f7f7;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.text-button {
+  border: none !important;
+  background: none !important;
+  cursor: pointer !important;
+  text-decoration: underline !important;
+  color: #2d50ec !important;
+  margin: 0 !important;
+  padding: 0 1em !important;
+}
+
+.error-message{
+  color: rgb(219, 72, 72);
+  border: solid 1px rgb(219, 72, 72);
+  padding: 1em;
+}

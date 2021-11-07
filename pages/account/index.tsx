@@ -29,10 +29,10 @@ export default function AccountIndex() {
       .then((response) => {
         setUser({
           ...user,
-          name: response.data.user.name || "",
-          email: response.data.user.email || "",
-          phone: response.data.user.phone || "",
-          image: response.data.user.image || "",
+          name: response.data.name || "",
+          email: response.data.email || "",
+          phone: response.data.phone || "",
+          image: response.data.image || "",
         })
         setDataModified(false)
       })
@@ -65,10 +65,10 @@ export default function AccountIndex() {
         console.log("User Updated")
         setUser({
           ...user,
-          name: response.data.user.name || "",
-          email: response.data.user.email || "",
-          phone: response.data.user.phone || "",
-          image: response.data.user.image || "",
+          name: response.data.name || "",
+          email: response.data.email || "",
+          phone: response.data.phone || "",
+          image: response.data.image || "",
         })
         setDataModified(false)
       })
@@ -221,7 +221,7 @@ export default function AccountIndex() {
             </fieldset>
             <br />
             <button type="submit">Save</button>
-            {dataModified && (
+            {(
               <button type="button" className={"text-button"} onClick={getUser}>
                 Cancel
               </button>

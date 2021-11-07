@@ -2,16 +2,57 @@ import { getSession } from "next-auth/react"
 import type { NextApiRequest, NextApiResponse } from "next"
 import connectDB from "../../../middleware/mongodb"
 import User from "../../../models/user"
-import Session from "../../../models/session"
+import multer from "multer"
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: any) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result: any) => {
+      if (result instanceof Error) {
+        return reject(result)
+      }
+      return resolve(result)
+    })
+  })
+}
+
+const handler = async (req: any, res: NextApiResponse) => {
+  await runMiddleware(req, res, multer().single("file"))
+
+  const { method } = req
   const session = await getSession({ req })
+  if (session !== null) {
+    let user = await User.findOne({ email: session.user!.email })
+    switch (method) {
+      case "GET":
+        res.json(user)
+        break
+      case "PATCH":
+        user.name = req.body.name
+        user.email = req.body.email
+        user.phone = req.body.phone
+        user.image = req.body.image
 
-  // let userJson:any[] = []
-// 
-  // let users = await User.find()
+        if(req.file){
+          console.log({file: req.file})
+        }
 
-  res.json(session)
+        user = await user.save()
+
+        res.json(user)
+        break
+      default:
+        res.setHeader("Allow", ["GET", "PATCH"])
+        res.status(405).end(`Method ${method} Not Allowed`)
+    }
+  } else {
+    res.status(403).end("No Current User")
+  }
 }
 
 export default connectDB(handler)
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}

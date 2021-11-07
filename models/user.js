@@ -15,6 +15,10 @@ const user = new Schema({
         type: String,
         required: false
     },
+    phone: {
+        type: String,
+        required: false
+    },
     emailVerified: {
         type: Date,
         required: false

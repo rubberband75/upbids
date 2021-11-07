@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next"
 import connectDB from "../../../middleware/mongodb"
 import User from "../../../models/user"
 import multer from "multer"
+import uploadCoudinaryImage from "../../../lib/cloudinary"
 
 function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: any) {
   return new Promise((resolve, reject) => {
@@ -32,12 +33,18 @@ const handler = async (req: any, res: NextApiResponse) => {
         user.phone = req.body.phone
         user.image = req.body.image
 
-        if(req.file){
-          console.log({file: req.file})
+        if (req.file) {
+          try {
+            let cloudinaryImage = await uploadCoudinaryImage(req.file)
+            console.log(cloudinaryImage)
+            user.image = cloudinaryImage.secure_url
+          } catch (error) {
+            console.error(error)
+            return res.status(500).end("Error Uploading Image")
+          }
         }
 
         user = await user.save()
-
         res.json(user)
         break
       default:

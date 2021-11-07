@@ -70,6 +70,7 @@ export default function AccountIndex() {
           phone: response.data.phone || "",
           image: response.data.image || "",
         })
+        resetImage()
         setDataModified(false)
       })
       .catch((error) => {
@@ -221,11 +222,11 @@ export default function AccountIndex() {
             </fieldset>
             <br />
             <button type="submit">Save</button>
-            {(
+            {
               <button type="button" className={"text-button"} onClick={getUser}>
                 Cancel
               </button>
-            )}
+            }
           </form>
         </>
       )}

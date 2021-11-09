@@ -1,20 +1,10 @@
 import { getSession } from "next-auth/react"
 import type { NextApiRequest, NextApiResponse } from "next"
 import connectDB from "../../../middleware/mongodb"
+import runMiddleware from "../../../middleware/runMiddleware"
 import User from "../../../models/user"
 import multer from "multer"
 import uploadCoudinaryImage from "../../../lib/cloudinary"
-
-function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: any) {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result: any) => {
-      if (result instanceof Error) {
-        return reject(result)
-      }
-      return resolve(result)
-    })
-  })
-}
 
 const handler = async (req: any, res: NextApiResponse) => {
   await runMiddleware(req, res, multer().single("file"))

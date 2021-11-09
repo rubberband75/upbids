@@ -1,32 +1,57 @@
-import type { NextApiRequest, NextApiResponse } from "next"
-import { getSession } from "next-auth/react"
+import type { ApiRequest, ApiResponse } from "../../../types/api"
 import runMiddleware from "../../../middleware/runMiddleware"
-import connectDB from "../../../middleware/mongodb"
+import getCurrentUser from "../../../middleware/getCurrentUser"
+import connectToDB from "../../../middleware/connectToDB"
 import multer from "multer"
 import AuctionEvent from "../../../models/AuctionEvent"
+import uploadCoudinaryImage from "../../../lib/cloudinary"
 
-const handler = async (req: any, res: NextApiResponse) => {
-  await runMiddleware(req, res, multer().single("file"))
+const handler = async (req: ApiRequest, res: ApiResponse) => {
+  await runMiddleware(req, res, connectToDB)
+  await runMiddleware(req, res, multer().single("bannerImage"))
+  await runMiddleware(req, res, getCurrentUser)
+
+  // Return 403 error if not logged in
+  if (!req.user) return res.status(403).json({ error: "Must be logged in" })
 
   const { method } = req
-  const session = await getSession({ req })
-
   switch (method) {
     case "GET":
+      // List all AuctionEvents
       let auctionEvents = await AuctionEvent.find()
       res.json(auctionEvents)
       break
     case "POST":
-      let { title } = req.body
-      console.log({ body: req.body, file: req.file })
+      // Extract fields from req body
+      let { title, description, slug } = req.body || {}
 
+      // Check for duplicate slugs
+      if (slug) {
+        let existingSlug = await AuctionEvent.findOne({ slug })
+        if (existingSlug)
+          return res.status(400).json({ error: "URL slug already exists" })
+      }
+
+      // Create event object
       let event = new AuctionEvent({
-        title: "test",
+        title,
+        description,
+        slug,
       })
 
-      let image
-      // await event.save()
+      // If file included, upload and save URL
+      if (req.file) {
+        try {
+          let cloudinaryImage = await uploadCoudinaryImage(req.file)
+          event.bannerImage = cloudinaryImage.secure_url
+        } catch (error) {
+          console.error(error)
+          return res.status(500).end("Error Uploading Image")
+        }
+      }
 
+      // Save and return event object
+      // await event.save()
       res.json(event)
       break
     default:
@@ -35,8 +60,7 @@ const handler = async (req: any, res: NextApiResponse) => {
   }
 }
 
-export default connectDB(handler)
-
+export default handler
 export const config = {
   api: {
     bodyParser: false,

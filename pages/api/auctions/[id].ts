@@ -1,6 +1,5 @@
 import type { ApiRequest, ApiResponse } from "../../../types/api"
 import runMiddleware from "../../../middleware/runMiddleware"
-import connectDB from "../../../middleware/mongodb"
 import multer from "multer"
 import AuctionEvent from "../../../models/AuctionEvent"
 import uploadCoudinaryImage from "../../../lib/cloudinary"
@@ -13,7 +12,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, getCurrentUser)
 
   // Return 403 error if not logged in
-  // if (!req.user) return res.status(403).json({ error: "Must be logged in" })
+  if (!req.user) return res.status(403).json({ error: "Must be logged in" })
 
   const {
     query: { id },
@@ -30,10 +29,10 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           return res.status(404).json({ error: "Event Not Found" })
 
         // Throw 403 if not owned by current user
-        // if (!req.user || `${auctionEvent.userId}` != `${req.user._id}`)
-        //   return res
-        //     .status(403)
-        //     .json({ error: "You do not have permission to view this event" })
+        if (!req.user || `${auctionEvent.userId}` != `${req.user._id}`)
+          return res
+            .status(403)
+            .json({ error: "You do not have permission to view this event" })
 
         res.json(auctionEvent)
       } catch (error) {
@@ -49,10 +48,10 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           return res.status(404).json({ error: "Event Not Found" })
 
         // Throw 403 if not owned by current user
-        // if (!req.user || `${auctionEvent.userId}` != `${req.user._id}`)
-        //   return res
-        //     .status(403)
-        //     .json({ error: "You do not have permission to view this event" })
+        if (!req.user || `${auctionEvent.userId}` != `${req.user._id}`)
+          return res
+            .status(403)
+            .json({ error: "You do not have permission to view this event" })
 
         // Extract fields from req body
         let { title, description, slug, published, biddingOpen } =

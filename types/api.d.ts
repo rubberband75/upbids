@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 
 interface ApiRequest extends NextApiRequest {
-  user?: any
+  user?: User
   file?: any
 }
 

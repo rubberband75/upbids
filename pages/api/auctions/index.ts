@@ -7,8 +7,8 @@ import AuctionEvent from "../../../models/AuctionEvent"
 import uploadCoudinaryImage from "../../../lib/cloudinary"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
-  await runMiddleware(req, res, connectToDB)
   await runMiddleware(req, res, multer().single("bannerImage"))
+  await runMiddleware(req, res, connectToDB)
   await runMiddleware(req, res, getCurrentUser)
 
   // Return 403 error if not logged in
@@ -17,12 +17,9 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   const { method } = req
   switch (method) {
     case "GET":
-      // List all AuctionEvents
-
-      let user = req.user
-      console.log(user)
-
-      let auctionEvents = await AuctionEvent.find({userId: req.user?._id})
+      let auctionEvents: AuctionEvent[] = await AuctionEvent.find({
+        userId: req.user?._id,
+      })
       res.json(auctionEvents)
       break
     case "POST":
@@ -31,13 +28,13 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
       // Check for duplicate slugs
       if (slug) {
-        let existingSlug = await AuctionEvent.findOne({ slug })
+        let existingSlug: AuctionEvent = await AuctionEvent.findOne({ slug })
         if (existingSlug)
           return res.status(400).json({ error: "URL slug already exists" })
       }
 
       // Create event object
-      let event = new AuctionEvent({
+      let event: AuctionEvent = new AuctionEvent({
         title,
         description,
         slug,

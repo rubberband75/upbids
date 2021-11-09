@@ -1,5 +1,12 @@
 import mongoose from "mongoose"
+import User from "./user"
 const Schema = mongoose.Schema
+
+interface Session extends mongoose.Document {
+  sessionToken: string
+  userId: string | User
+  expires?: Date
+}
 
 const session = new Schema({
   sessionToken: {
@@ -17,8 +24,7 @@ const session = new Schema({
   },
 })
 
-mongoose.models = {};
-
-var Session = mongoose.model("Session", session)
+var Session =
+  mongoose.models.Session || mongoose.model<Session>("Session", session)
 
 export default Session

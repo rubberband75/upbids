@@ -1,5 +1,16 @@
 import mongoose from "mongoose"
+import User from "./user"
 const Schema = mongoose.Schema
+
+interface AuctionEvent extends mongoose.Document {
+  userId: string | User
+  title?: string
+  description?: string
+  bannerImage?: string
+  slug?: string
+  published?: Boolean
+  biddingOpen?: Boolean
+}
 
 const auctionEvent = new Schema({
   userId: {
@@ -39,8 +50,6 @@ const auctionEvent = new Schema({
   },
 })
 
-mongoose.models = {}
-
-var AuctionEvent = mongoose.model("AuctionEvent", auctionEvent)
+var AuctionEvent = mongoose.models.AuctionEvent || mongoose.model<AuctionEvent>("AuctionEvent", auctionEvent)
 
 export default AuctionEvent

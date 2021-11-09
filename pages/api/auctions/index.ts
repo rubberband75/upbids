@@ -18,7 +18,11 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   switch (method) {
     case "GET":
       // List all AuctionEvents
-      let auctionEvents = await AuctionEvent.find()
+
+      let user = req.user
+      console.log(user)
+
+      let auctionEvents = await AuctionEvent.find({userId: req.user?._id})
       res.json(auctionEvents)
       break
     case "POST":
@@ -51,7 +55,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       }
 
       // Save and return event object
-      // await event.save()
+      await event.save()
       res.json(event)
       break
     default:

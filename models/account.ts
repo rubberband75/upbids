@@ -1,5 +1,18 @@
 import mongoose from "mongoose"
+import User from "./user"
 const Schema = mongoose.Schema
+
+interface Account extends mongoose.Document {
+  provider?: string
+  type?: string
+  providerAccountId?: string
+  access_token?: string
+  expires_at?: Number
+  scope?: string
+  token_type?: string
+  id_token?: string
+  userId?: string | User
+}
 
 const account = new Schema({
   provider: {
@@ -41,8 +54,7 @@ const account = new Schema({
   },
 })
 
-mongoose.models = {};
-
-var Account = mongoose.model("Account", account)
+var Account =
+  mongoose.models.Account || mongoose.model<Account>("Account", account)
 
 export default Account

@@ -33,7 +33,7 @@ export default function NewAuctionPage() {
       setLoading(true)
       let result = await axios.post("/api/auctions", formData)
       console.log(result)
-      window.location.href = `/auctions/${result.data._id}`;
+      window.location.href = `/auctions/${result.data._id}`
     } catch (error: any) {
       setErrorMessage(`${error.response.data.error}`)
     } finally {
@@ -81,14 +81,14 @@ export default function NewAuctionPage() {
       <form onSubmit={handleSubmit}>
         <fieldset>
           <legend>Account Details</legend>
+          <div
+            style={{
+              backgroundImage: `url(${previewImage})`,
+            }}
+            className={"bannerImage"}
+          ></div>
+          <br />
           <p>
-            <div
-              style={{
-                backgroundImage: `url(${previewImage})`,
-              }}
-              className={"bannerImage"}
-            ></div>
-            <br />
             <input
               hidden
               type="file"

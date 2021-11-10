@@ -2,6 +2,7 @@ import Layout from "../../components/layout"
 import { useRouter } from "next/router"
 import React, { useEffect, useState, useRef } from "react"
 import axios from "axios"
+import Link from "next/link"
 
 export default function EditAuctionPage() {
   const router = useRouter()
@@ -134,7 +135,14 @@ export default function EditAuctionPage() {
 
   return (
     <Layout>
-      <h1>Edit Auction</h1>
+      <h1>
+        Edit Auction
+        <small style={{ marginLeft: "1em" }}>
+          <Link href={`/${event.slug}`}>
+            <a>View Live</a>
+          </Link>
+        </small>
+      </h1>
       {errorMessage && (
         // Error Message
         <p className={"error-message"}>{errorMessage}</p>
@@ -151,16 +159,14 @@ export default function EditAuctionPage() {
           <form onSubmit={handleSubmit}>
             <fieldset>
               <legend>Account Details</legend>
+              <div
+                style={{
+                  backgroundImage: `url(${previewImage || event.bannerImage})`,
+                }}
+                className={"bannerImage"}
+              ></div>
+              <br />
               <p>
-                <div
-                  style={{
-                    backgroundImage: `url(${
-                      previewImage || event.bannerImage
-                    })`,
-                  }}
-                  className={"bannerImage"}
-                ></div>
-                <br />
                 <input
                   hidden
                   type="file"

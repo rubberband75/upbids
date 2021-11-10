@@ -138,14 +138,14 @@ export default function AccountIndex() {
           <form onSubmit={handleSubmit}>
             <fieldset>
               <legend>Account Details</legend>
+              <div
+                style={{
+                  backgroundImage: `url(${previewImage || user.image})`,
+                }}
+                className={"profilePicture"}
+              ></div>
+              <br />
               <p style={{ width: "fit-content" }}>
-                <div
-                  style={{
-                    backgroundImage: `url(${previewImage || user.image})`,
-                  }}
-                  className={"profilePicture"}
-                ></div>
-                <br />
                 <input
                   hidden
                   type="file"

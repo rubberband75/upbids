@@ -222,11 +222,11 @@ export default function AccountIndex() {
             </fieldset>
             <br />
             <button type="submit">Save</button>
-            {
+            {dataModified && (
               <button type="button" className={"text-button"} onClick={getUser}>
                 Cancel
               </button>
-            }
+            )}
           </form>
         </>
       )}

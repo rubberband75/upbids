@@ -30,11 +30,12 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       if (slug) {
         let existingSlug: AuctionEvent = await AuctionEvent.findOne({ slug })
         if (existingSlug)
-          return res.status(400).json({ error: "URL slug already exists" })
+          return res.status(400).json({ error: "Event URL already exists" })
       }
 
       // Create event object
       let event: AuctionEvent = new AuctionEvent({
+        userId: req.user._id,
         title,
         description,
         slug,

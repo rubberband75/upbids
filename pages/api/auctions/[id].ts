@@ -58,10 +58,10 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           req.body || {}
 
         // Check for duplicate slugs
-        if (slug) {
+        if (slug && slug != auctionEvent.slug) {
           let existingSlug = await AuctionEvent.findOne({ slug })
           if (existingSlug)
-            return res.status(400).json({ error: "URL slug already exists" })
+            return res.status(400).json({ error: "Event URL already exists" })
         }
 
         // If file included, upload and save URL
@@ -86,6 +86,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         res.json(auctionEvent)
       } catch (error) {
         // Thow 500 error if any uncaught errors occure
+        console.error(error)
         return res.status(500).json({ error: "Error Updating Event" })
       }
       break

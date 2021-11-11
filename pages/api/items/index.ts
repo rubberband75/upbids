@@ -18,7 +18,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   switch (method) {
     case "GET":
       let auctionItems: AuctionItem[] = await AuctionItem.find()
-      res.json(auctionItems)
+      res.json({ auctionItems })
       break
     case "POST":
       // Extract fields from req body
@@ -71,7 +71,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       // Save and return item object
       try {
         await item.save()
-        res.json(item)
+        res.json({ auctionItem: item })
       } catch (error: any) {
         return res.status(500).end(`${error}` || "Error Saving Item")
       }

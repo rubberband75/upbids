@@ -45,8 +45,6 @@ export default function EditAuctionPage() {
           biddingOpen: response.data.auctionEvent.biddingOpen || false,
         })
 
-        console.log({ items: response.data.auctionItems })
-
         setAuctionItems(response.data.auctionItems)
         setDataModified(false)
       })
@@ -307,13 +305,13 @@ export default function EditAuctionPage() {
           <ul>
             {auctionItems.map(({ _id, title }) => (
               <li key={_id}>
-                <Link href={`/items/${_id}`}>
+                <Link href={`/items/${_id}?auctionId=${id}`}>
                   <a>{title}</a>
                 </Link>
               </li>
             ))}
           </ul>
-          <Link href={`/auctions/${id}/items/new`}>
+          <Link href={`/items/new?eventId=${id}`}>
             <button type="button">+ Add Item</button>
           </Link>
         </>

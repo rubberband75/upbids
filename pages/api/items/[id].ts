@@ -32,7 +32,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
   switch (method) {
     case "GET":
-      return res.json(auctionItem)
+      return res.json({ auctionItem })
       break
     case "PATCH":
       try {
@@ -66,7 +66,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
             auctionItem.image = cloudinaryImage.secure_url
           } catch (error) {
             console.error(error)
-            return res.status(500).json({ error: "Error Uploading Image"})
+            return res.status(500).json({ error: "Error Uploading Image" })
           }
         }
 
@@ -81,9 +81,11 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         if (published != undefined) auctionItem.published = published
 
         auctionItem.save()
-        return res.json(auctionItem)
+        return res.json({ auctionItem })
       } catch (error: any) {
-        return res.status(500).json({ error: `${error}` || "Error Updating Item"})
+        return res
+          .status(500)
+          .json({ error: `${error}` || "Error Updating Item" })
       }
     case "DELETE":
       try {

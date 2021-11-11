@@ -2,6 +2,7 @@ import type { ApiRequest, ApiResponse } from "../../../../../types/api"
 import runMiddleware from "../../../../../middleware/runMiddleware"
 import AuctionEvent from "../../../../../models/AuctionEvent"
 import connectToDB from "../../../../../middleware/connectToDB"
+import AuctionItem from "../../../../../models/AuctionItem"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, connectToDB)
@@ -23,7 +24,12 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         if (!auctionEvent)
           return res.status(404).json({ error: "Event Not Found" })
 
-        res.json(auctionEvent)
+        let auctionItems: AuctionItem[] = await AuctionItem.find({
+          eventId: auctionEvent._id,
+          published: true,
+        })
+
+        res.json({ auctionEvent, auctionItems })
       } catch (error) {
         return res.status(404).json({ error: "Error Loading Event" })
       }

@@ -11,48 +11,37 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, connectToDB)
   await runMiddleware(req, res, getCurrentUser)
 
-  // Return 403 error if not logged in
-  if (!req.user) return res.status(403).json({ error: "Must be logged in" })
-
+  // Get object id and request method
   const {
     query: { id },
     method,
   } = req
 
+  // Return 403 error if not logged in
+  // if (!req.user) return res.status(403).json({ error: "Must be logged in" })
+
+  // Load AuctionEvent
+  let auctionEvent: AuctionEvent
+  try {
+    auctionEvent = await AuctionEvent.findOne({ _id: id })
+    if (!auctionEvent)
+      return res.status(404).json({ error: "Auction Not Found" })
+  } catch (error) {
+    return res.status(500).json({ error: "Error Loading Auction" })
+  }
+
+  // Check that Event is owned by current user
+  // if (`${auctionEvent.userId}` != `${req.user._id}`)
+  //   return res
+  //     .status(403)
+  //     .json({ error: "You do not have permission to view this event" })
+
   switch (method) {
     case "GET":
-      try {
-        let auctionEvent: AuctionEvent = await AuctionEvent.findOne({ _id: id })
-
-        // Throw 404 if event id not found
-        if (!auctionEvent)
-          return res.status(404).json({ error: "Event Not Found" })
-
-        // Throw 403 if not owned by current user
-        if (!req.user || `${auctionEvent.userId}` != `${req.user._id}`)
-          return res
-            .status(403)
-            .json({ error: "You do not have permission to view this event" })
-
-        res.json(auctionEvent)
-      } catch (error) {
-        return res.status(404).json({ error: "Error Loading Event" })
-      }
+      return res.json(auctionEvent)
       break
     case "PATCH":
       try {
-        let auctionEvent: AuctionEvent = await AuctionEvent.findOne({ _id: id })
-
-        // Throw 404 if event id not found
-        if (!auctionEvent)
-          return res.status(404).json({ error: "Event Not Found" })
-
-        // Throw 403 if not owned by current user
-        if (!req.user || `${auctionEvent.userId}` != `${req.user._id}`)
-          return res
-            .status(403)
-            .json({ error: "You do not have permission to view this event" })
-
         // Extract fields from req body
         let { title, description, slug, published, biddingOpen } =
           req.body || {}
@@ -70,7 +59,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
             let cloudinaryImage = await uploadCoudinaryImage(req.file)
             auctionEvent.bannerImage = cloudinaryImage.secure_url
           } catch (error) {
-            return res.status(500).end("Error Uploading Image")
+            return res.status(500).json({ error: "Error Uploading Image" })
           }
         }
 
@@ -83,15 +72,23 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
         // Save and return event object
         await auctionEvent.save()
-        res.json(auctionEvent)
+        return res.json(auctionEvent)
       } catch (error) {
         // Thow 500 error if any uncaught errors occure
         console.error(error)
         return res.status(500).json({ error: "Error Updating Event" })
       }
-      break
+    case "DELETE":
+      try {
+        await auctionEvent.delete()
+        return res.end(`Item Deleted: ${id}`)
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ error: `${error}` || "Error Deleting Event" })
+      }
     default:
-      res.setHeader("Allow", ["GET", "PATCH"])
+      res.setHeader("Allow", ["GET", "PATCH", "DELETE"])
       res.status(405).end(`Method ${method} Not Allowed`)
   }
 }

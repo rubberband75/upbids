@@ -57,6 +57,8 @@ export default function EditItemPage() {
       // Send PATCH request
       let response = await axios.patch(`/api/items/${id}`, formData)
       setAuctionItem(response.data.auctionItem)
+
+      resetImage()
       setDataModified(false)
     } catch (error: any) {
       try {
@@ -91,19 +93,32 @@ export default function EditItemPage() {
         setPreviewImage(`${loadedImage}`)
       }
     }
+    setDataModified(true)
   }
-  const deleteImage = () => {
+
+  const resetImage = () => {
     setSelectedFile(null)
     setPreviewImage("")
   }
 
+  const deleteImage = () => {
+    resetImage()
+    let item: any = { ...auctionItem, image: "" }
+    setAuctionItem(item)
+    setDataModified(true)
+  }
+
   return (
     <Layout>
+      <p>
+        <a href={`/auctions/${auctionItem?.eventId}`}>Back to Auction</a>
+      </p>
       <h1>Edit Item</h1>
       {/* // Error Message */}
       {errorMessage && <p className={"error-message"}>{errorMessage}</p>}
       {/* // Loaing Message */}
       {loading && <p>Loading...</p>}
+      {/* Item Details Form */}
       {!loading && (
         <>
           <form onSubmit={handleSubmit}>
@@ -130,15 +145,24 @@ export default function EditItemPage() {
                   style={{ padding: ".5em" }}
                   onClick={() => imageInputRef.current.click()}
                 >
-                  Add Image
+                  Update Image
                 </button>
-                {previewImage && (
+                {auctionItem?.image && (
                   <button
                     type="button"
                     className={"text-button"}
                     onClick={deleteImage}
                   >
                     Delete
+                  </button>
+                )}
+                {previewImage && (
+                  <button
+                    type="button"
+                    className={"text-button"}
+                    onClick={resetImage}
+                  >
+                    Reset
                   </button>
                 )}
               </p>

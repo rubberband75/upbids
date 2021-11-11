@@ -7,7 +7,7 @@ import uploadCoudinaryImage from "../../../lib/cloudinary"
 import AuctionItem from "../../../models/AuctionItem"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
-  await runMiddleware(req, res, multer().single("image"))
+  await runMiddleware(req, res, multer().single("file"))
   await runMiddleware(req, res, connectToDB)
   await runMiddleware(req, res, getCurrentUser)
 

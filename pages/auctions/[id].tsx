@@ -6,13 +6,13 @@ import Link from "next/link"
 import AuctionItem from "../../models/AuctionItem"
 
 export default function EditAuctionPage() {
+  const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
+
   const router = useRouter()
   const { id } = router.query
 
-  const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
-
-  let [errorMessage, setErrorMessage] = useState("")
   let [loading, setLoading] = useState(true)
+  let [errorMessage, setErrorMessage] = useState("")
   let [event, setEvent] = useState({
     _id: "",
     bannerImage: "",
@@ -87,6 +87,7 @@ export default function EditAuctionPage() {
         published: response.data.auctionEvent.published || false,
         biddingOpen: response.data.auctionEvent.biddingOpen || false,
       })
+
       resetImage()
       setDataModified(false)
     } catch (error: any) {

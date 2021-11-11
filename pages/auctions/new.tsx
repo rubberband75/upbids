@@ -32,10 +32,15 @@ export default function NewAuctionPage() {
       setErrorMessage("")
       setLoading(true)
       let result = await axios.post("/api/auctions", formData)
-      console.log(result)
+
+      // Redirect to new event
       window.location.href = `/auctions/${result.data._id}`
     } catch (error: any) {
-      setErrorMessage(`${error.response.data.error}`)
+      try {
+        setErrorMessage(`Error: ${error.response.data.error}`)
+      } catch (e) {
+        setErrorMessage(`${error}`)
+      }
     } finally {
       setLoading(false)
     }

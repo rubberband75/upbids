@@ -59,17 +59,6 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
             return res.status(400).json({ error: "Lot Number Taken" })
         }
 
-        // If file included, upload and save URL
-        if (req.file) {
-          try {
-            let cloudinaryImage = await uploadCoudinaryImage(req.file)
-            auctionItem.image = cloudinaryImage.secure_url
-          } catch (error) {
-            console.error(error)
-            return res.status(500).json({ error: "Error Uploading Image" })
-          }
-        }
-
         if (title != undefined) auctionItem.title = title
         if (description != undefined) auctionItem.description = description
         if (image != undefined) auctionItem.image = image
@@ -80,6 +69,16 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           auctionItem.minimunIncrement = minimunIncrement
         if (published != undefined) auctionItem.published = published
 
+        // If file included, upload and save URL
+        if (req.file) {
+          try {
+            let cloudinaryImage = await uploadCoudinaryImage(req.file)
+            auctionItem.image = cloudinaryImage.secure_url
+          } catch (error) {
+            console.error(error)
+            return res.status(500).json({ error: "Error Uploading Image" })
+          }
+        }
         auctionItem.save()
         return res.json({ auctionItem })
       } catch (error: any) {

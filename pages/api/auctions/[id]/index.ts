@@ -2,6 +2,7 @@ import type { ApiRequest, ApiResponse } from "../../../../types/api"
 import runMiddleware from "../../../../middleware/runMiddleware"
 import multer from "multer"
 import AuctionEvent from "../../../../models/AuctionEvent"
+import AuctionItem from "../../../../models/AuctionItem"
 import uploadCoudinaryImage from "../../../../lib/cloudinary"
 import connectToDB from "../../../../middleware/connectToDB"
 import getCurrentUser from "../../../../middleware/getCurrentUser"
@@ -38,8 +39,11 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
   switch (method) {
     case "GET":
-      return res.json(auctionEvent)
-      break
+      let auctionItems: AuctionItem[] = await AuctionItem.find({
+        eventId: auctionEvent._id
+      })
+
+      return res.json({ auctionEvent, auctionItems })
     case "PATCH":
       try {
         // Extract fields from req body
@@ -74,7 +78,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
         // Save and return event object
         await auctionEvent.save()
-        return res.json(auctionEvent)
+        return res.json({auctionEvent})
       } catch (error) {
         // Thow 500 error if any uncaught errors occure
         console.error(error)

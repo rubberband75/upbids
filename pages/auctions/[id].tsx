@@ -3,6 +3,7 @@ import { useRouter } from "next/router"
 import React, { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import Link from "next/link"
+import AuctionItem from "../../models/AuctionItem"
 
 export default function EditAuctionPage() {
   const router = useRouter()
@@ -25,6 +26,8 @@ export default function EditAuctionPage() {
   const [previewImage, setPreviewImage] = useState("")
   const [dataModified, setDataModified] = useState(false)
 
+  let [auctionItems, setAuctionItems] = useState<AuctionItem[]>([])
+
   const getEvent = () => {
     setErrorMessage("")
     resetImage()
@@ -33,14 +36,18 @@ export default function EditAuctionPage() {
       .then((response) => {
         setEvent({
           ...event,
-          _id: response.data._id || "",
-          bannerImage: response.data.bannerImage || "",
-          title: response.data.title || "",
-          description: response.data.description || "",
-          slug: response.data.slug || "",
-          published: response.data.published || false,
-          biddingOpen: response.data.biddingOpen || false,
+          _id: response.data.auctionEvent._id || "",
+          bannerImage: response.data.auctionEvent.bannerImage || "",
+          title: response.data.auctionEvent.title || "",
+          description: response.data.auctionEvent.description || "",
+          slug: response.data.auctionEvent.slug || "",
+          published: response.data.auctionEvent.published || false,
+          biddingOpen: response.data.auctionEvent.biddingOpen || false,
         })
+
+        console.log({ items: response.data.auctionItems })
+
+        setAuctionItems(response.data.auctionItems)
         setDataModified(false)
       })
       .catch((error: any) => {
@@ -75,12 +82,12 @@ export default function EditAuctionPage() {
       let response = await axios.patch(`/api/auctions/${event._id}`, formData)
       setEvent({
         ...event,
-        bannerImage: response.data.bannerImage || "",
-        title: response.data.title || "",
-        description: response.data.description || "",
-        slug: response.data.slug || "",
-        published: response.data.published || false,
-        biddingOpen: response.data.biddingOpen || false,
+        bannerImage: response.data.auctionEvent.bannerImage || "",
+        title: response.data.auctionEvent.title || "",
+        description: response.data.auctionEvent.description || "",
+        slug: response.data.auctionEvent.slug || "",
+        published: response.data.auctionEvent.published || false,
+        biddingOpen: response.data.auctionEvent.biddingOpen || false,
       })
       resetImage()
       setDataModified(false)
@@ -288,6 +295,27 @@ export default function EditAuctionPage() {
               </button>
             )}
           </form>
+
+          <br />
+          <h2>Auction Items</h2>
+          <hr />
+          {!auctionItems.length && (
+            <div>
+              <i>You haven't added any auction items</i>
+            </div>
+          )}
+          <ul>
+            {auctionItems.map(({ _id, title }) => (
+              <li key={_id}>
+                <Link href={`/items/${_id}`}>
+                  <a>{title}</a>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link href={`/auctions/${id}/items/new`}>
+            <button type="button">+ Add Item</button>
+          </Link>
         </>
       )}
     </Layout>

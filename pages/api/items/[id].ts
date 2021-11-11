@@ -19,7 +19,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   } = req
 
   // Return 403 error if not logged in
-  // if (!req.user) return res.status(403).json({ error: "Must be logged in" })
+  if (!req.user) return res.status(403).json({ error: "Must be logged in" })
 
   // Load Item
   let auctionItem: AuctionItem
@@ -36,12 +36,6 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       break
     case "PATCH":
       try {
-        // let auctionItem: AuctionItem = await AuctionItem.findOne({ _id: id })
-
-        // Throw 404 if event id not found
-        if (!auctionItem)
-          return res.status(404).json({ error: "Item Not Found" })
-
         // Extract fields from req body
         let {
           eventId,
@@ -89,7 +83,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         auctionItem.save()
         return res.json(auctionItem)
       } catch (error: any) {
-        return res.status(500).json({ error: `${error}` || "Error Saving Item"})
+        return res.status(500).json({ error: `${error}` || "Error Updating Item"})
       }
     case "DELETE":
       try {

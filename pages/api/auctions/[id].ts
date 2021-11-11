@@ -18,7 +18,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   } = req
 
   // Return 403 error if not logged in
-  // if (!req.user) return res.status(403).json({ error: "Must be logged in" })
+  if (!req.user) return res.status(403).json({ error: "Must be logged in" })
 
   // Load AuctionEvent
   let auctionEvent: AuctionEvent
@@ -31,10 +31,10 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   }
 
   // Check that Event is owned by current user
-  // if (`${auctionEvent.userId}` != `${req.user._id}`)
-  //   return res
-  //     .status(403)
-  //     .json({ error: "You do not have permission to view this event" })
+  if (`${auctionEvent.userId}` != `${req.user._id}`)
+    return res
+      .status(403)
+      .json({ error: "You do not have permission to view this event" })
 
   switch (method) {
     case "GET":
@@ -59,7 +59,9 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
             let cloudinaryImage = await uploadCoudinaryImage(req.file)
             auctionEvent.bannerImage = cloudinaryImage.secure_url
           } catch (error) {
-            return res.status(500).json({ error: "Error Uploading Image" })
+            return res
+              .status(500)
+              .json({ error: `${error}` || "Error Uploading Image" })
           }
         }
 
@@ -76,7 +78,9 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       } catch (error) {
         // Thow 500 error if any uncaught errors occure
         console.error(error)
-        return res.status(500).json({ error: "Error Updating Event" })
+        return res
+          .status(500)
+          .json({ error: `${error}` || "Error Updating Event" })
       }
     case "DELETE":
       try {

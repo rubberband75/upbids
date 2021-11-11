@@ -305,7 +305,7 @@ export default function EditAuctionPage() {
           <ul>
             {auctionItems.map(({ _id, title }) => (
               <li key={_id}>
-                <Link href={`/items/${_id}?auctionId=${id}`}>
+                <Link href={`/items/${_id}`}>
                   <a>{title}</a>
                 </Link>
               </li>

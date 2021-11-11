@@ -11,6 +11,7 @@ export default function EditItemPage() {
   const { eventId } = router.query
 
   let [loading, setLoading] = useState(true)
+  let [errorMessage, setErrorMessage] = useState("")
   let [auctionEvent, setAuctionEvent] = useState<AuctionEvent>()
 
   const getAuctionEvent = async () => {
@@ -32,8 +33,15 @@ export default function EditItemPage() {
   return (
     <Layout>
       <h1>New Item</h1>
-      <p>Id: {eventId}</p>
-      <h2>{auctionEvent?.title}</h2>
+      {/* // Error Message */}
+      {errorMessage && <p className={"error-message"}>{errorMessage}</p>}
+      {/* // Loaing Message */}
+      {loading && <p>Loading...</p>}
+      {!loading && (
+        <>
+          <h2>{auctionEvent?.title}</h2>
+        </>
+      )}
     </Layout>
   )
 }

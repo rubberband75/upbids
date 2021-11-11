@@ -1,7 +1,7 @@
-import type { ApiRequest, ApiResponse } from "../../../../types/api"
-import runMiddleware from "../../../../middleware/runMiddleware"
-import AuctionEvent from "../../../../models/AuctionEvent"
-import connectToDB from "../../../../middleware/connectToDB"
+import type { ApiRequest, ApiResponse } from "../../../../../types/api"
+import runMiddleware from "../../../../../middleware/runMiddleware"
+import AuctionEvent from "../../../../../models/AuctionEvent"
+import connectToDB from "../../../../../middleware/connectToDB"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, connectToDB)

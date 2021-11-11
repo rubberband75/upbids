@@ -1,10 +1,10 @@
-import type { ApiRequest, ApiResponse } from "../../../types/api"
-import runMiddleware from "../../../middleware/runMiddleware"
+import type { ApiRequest, ApiResponse } from "../../../../types/api"
+import runMiddleware from "../../../../middleware/runMiddleware"
 import multer from "multer"
-import AuctionEvent from "../../../models/AuctionEvent"
-import uploadCoudinaryImage from "../../../lib/cloudinary"
-import connectToDB from "../../../middleware/connectToDB"
-import getCurrentUser from "../../../middleware/getCurrentUser"
+import AuctionEvent from "../../../../models/AuctionEvent"
+import uploadCoudinaryImage from "../../../../lib/cloudinary"
+import connectToDB from "../../../../middleware/connectToDB"
+import getCurrentUser from "../../../../middleware/getCurrentUser"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, multer().single("bannerImage"))

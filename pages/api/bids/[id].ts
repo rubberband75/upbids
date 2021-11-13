@@ -16,7 +16,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   } = req
 
   // Return 403 error if not logged in
-  if (!req.user) return res.status(403).json({ error: "Must be logged in" })
+  //   if (!req.user) return res.status(403).json({ error: "Must be logged in" })
 
   // Load bid
   let bid: Bid
@@ -34,13 +34,8 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
     case "PATCH":
       try {
         // Extract fields from req body
-        let {
-          amount,
-          isTopBid,
-          won,
-          notified,
-          payed,
-        } = req.body || {}
+        console.log({ body: req.body })
+        let { amount, isTopBid, won, notified, payed } = req.body || {}
 
         // TODO: Check for equal/greter bid amounts on same item
 
@@ -73,8 +68,3 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 }
 
 export default handler
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}

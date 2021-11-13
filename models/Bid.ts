@@ -57,6 +57,6 @@ const bidSchema = new Schema({
   },
 })
 
-var Bid = mongoose.models.AuctionEvent || mongoose.model<Bid>("Bid", bidSchema)
+var Bid = mongoose.models.Bid || mongoose.model<Bid>("Bid", bidSchema)
 
 export default Bid

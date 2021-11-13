@@ -15,11 +15,15 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   const { method } = req
   switch (method) {
     case "GET":
-      let bids: Bid[] = await Bid.find()
+      let bids: Bid[] = await Bid.find({ userId: req.user?._id }).populate({
+        path: "itemId",
+        populate: "eventId",
+      })
       res.json({ bids })
       break
     case "POST":
       // Extract fields from req body
+      console.log({ body: req.body })
       let { userId, itemId, amount } = req.body || {}
 
       // Default to current user ID if none provided

@@ -1,5 +1,11 @@
 import type { ApiRequest, ApiResponse } from "../types/api"
 import mongoose from "mongoose"
+import AuctionItem from "../models/AuctionItem"
+import AuctionEvent from "../models/AuctionEvent"
+
+// Ensure all schemas are loaded
+let item = new AuctionItem()
+let event = new AuctionEvent()
 
 export default async function (
   req: ApiRequest,

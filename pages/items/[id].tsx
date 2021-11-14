@@ -111,10 +111,21 @@ export default function EditItemPage() {
     setDataModified(true)
   }
 
+  const deleteItem = async () => {
+    setLoading(true)
+    try {
+      await axios.delete(`/api/items/${id}`)
+      window.location.href = `/auctions/${auctionItem?.eventId}`
+    } catch (error: any) {
+      setErrorMessage(`${error.response.data.error}`)
+      setLoading(false)
+    }
+  }
+
   return (
     <Layout>
       <p>
-        <a href={`/auctions/${auctionItem?.eventId}`}>Back to Auction</a>
+        <a href={`/auctions/${auctionItem?.eventId}`}>{"<- "}Back to Auction</a>
       </p>
       <h1>Edit Item</h1>
       {/* // Error Message */}
@@ -316,6 +327,22 @@ export default function EditItemPage() {
           Download
         </a>
       </p>
+
+      <br />
+      <br />
+      <h2>Danger Zone</h2>
+      <hr />
+      <button
+        type="button"
+        style={{ backgroundColor: "#c11b1b" }}
+        onClick={() => {
+          if (confirm("Are you sure you want to delete this Item?")) {
+            deleteItem()
+          }
+        }}
+      >
+        Delete Auction
+      </button>
     </Layout>
   )
 }

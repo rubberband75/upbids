@@ -103,3 +103,18 @@ button[type=button], button[type=submit], button[type=reset] {
   border: solid 1px rgb(219, 72, 72);
   padding: 1em;
 }
+
+.card{
+  padding: 1em;
+  margin: .5em;
+  border-radius: 10px;
+  border: solid 1px gray
+}
+
+a .card {
+  text-decoration: none !important;
+}
+
+a:hover > .card {
+  background-color: #eeeeeeee;
+}

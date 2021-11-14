@@ -43,17 +43,17 @@ const auctionItem = new Schema({
   retailValue: {
     type: Number,
     required: false,
-    default: null,
+    default: 0.01,
   },
   startingBid: {
     type: Number,
     required: false,
-    default: null,
+    default: 0.01,
   },
   minimunIncrement: {
     type: Number,
     required: false,
-    default: null,
+    default: 0.01,
   },
   published: {
     type: Boolean,

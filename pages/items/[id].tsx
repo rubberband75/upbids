@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import Link from "next/link"
 import AuctionItem from "../../models/AuctionItem"
+import AuctionEvent from "../../models/AuctionEvent"
 
 export default function EditItemPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -14,6 +15,7 @@ export default function EditItemPage() {
   let [loading, setLoading] = useState(true)
   let [errorMessage, setErrorMessage] = useState("")
   let [auctionItem, setAuctionItem] = useState<AuctionItem>()
+  let [auctionEvent, setAuctionEvent] = useState<AuctionEvent>()
 
   const [selectedFile, setSelectedFile] = useState<File | null>()
   const [previewImage, setPreviewImage] = useState("")
@@ -26,6 +28,8 @@ export default function EditItemPage() {
     try {
       let response = await axios.get(`/api/items/${id}`)
       setAuctionItem(response.data.auctionItem)
+      setAuctionEvent(response.data.auctionItem.eventId)
+
       setDataModified(false)
       setQRHash(auctionItem?.lotNumber || 0)
     } catch (error) {
@@ -46,6 +50,7 @@ export default function EditItemPage() {
       // Iterate through keys in auctionItem and dd them to a formData object
       const formData = new FormData()
       let itemData: any = { ...auctionItem }
+      delete itemData.eventId
       for (const key in itemData) {
         if (itemData[key] !== null && itemData[key] !== undefined)
           formData.append(key, itemData[key].toString())
@@ -115,7 +120,7 @@ export default function EditItemPage() {
     setLoading(true)
     try {
       await axios.delete(`/api/items/${id}`)
-      window.location.href = `/auctions/${auctionItem?.eventId}`
+      window.location.href = `/auctions/${auctionEvent?._id}`
     } catch (error: any) {
       setErrorMessage(`${error.response.data.error}`)
       setLoading(false)
@@ -125,9 +130,16 @@ export default function EditItemPage() {
   return (
     <Layout>
       <p>
-        <a href={`/auctions/${auctionItem?.eventId}`}>{"<- "}Back to Auction</a>
+        <a href={`/auctions/${auctionEvent?._id}`}>{"<- "}Back to Auction</a>
       </p>
-      <h1>Edit Item</h1>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h1 style={{ display: "inline-block" }}>Edit Item</h1>
+        {auctionItem?.published && auctionItem?.lotNumber && (
+          <Link href={`/${auctionEvent?.slug}/${auctionItem?.lotNumber}`}>
+            <a style={{ margin: "auto 0" }}>View Public Page</a>
+          </Link>
+        )}
+      </div>
       {/* // Error Message */}
       {errorMessage && <p className={"error-message"}>{errorMessage}</p>}
       {/* // Loaing Message */}
@@ -314,19 +326,21 @@ export default function EditItemPage() {
       <h2>QR Code</h2>
       <hr />
       <i>Event URL and Lot Number must be set to generate QR Coder</i>
-      <p>
-        <a
-          href={`/api/items/${auctionItem?._id}/qr?${QRHash}`}
-          download={`Lot-${auctionItem?.lotNumber}-QR.png`}
-        >
-          <img
-            src={`/api/items/${auctionItem?._id}/qr?${QRHash}`}
-            width="50%"
-          />
-          <br />
-          Download
-        </a>
-      </p>
+      {!loading && (
+        <p>
+          <a
+            href={`/api/items/${auctionItem?._id}/qr?${QRHash}`}
+            download={`Lot-${auctionItem?.lotNumber}-QR.png`}
+          >
+            <img
+              src={`/api/items/${auctionItem?._id}/qr?${QRHash}`}
+              width="50%"
+            />
+            <br />
+            Download
+          </a>
+        </p>
+      )}
 
       <br />
       <br />

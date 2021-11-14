@@ -152,14 +152,14 @@ export default function EditAuctionPage() {
 
   return (
     <Layout>
-      <h1>
-        Edit Auction
-        <small style={{ marginLeft: "1em" }}>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h1 style={{ display: "inline-block" }}>Edit Auction</h1>
+        {event.published && (
           <Link href={`/${event.slug}`}>
-            <a>View Live</a>
+            <a style={{ margin: "auto 0" }}>View Public Page</a>
           </Link>
-        </small>
-      </h1>
+        )}
+      </div>
       {errorMessage && (
         // Error Message
         <p className={"error-message"}>{errorMessage}</p>
@@ -175,7 +175,7 @@ export default function EditAuctionPage() {
         <>
           <form onSubmit={handleSubmit}>
             <fieldset>
-              <legend>Account Details</legend>
+              <legend>Auction Details</legend>
               <div
                 style={{
                   backgroundImage: `url(${previewImage || event.bannerImage})`,

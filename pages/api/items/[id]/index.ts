@@ -24,7 +24,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   // Load Item
   let auctionItem: AuctionItem
   try {
-    auctionItem = await AuctionItem.findOne({ _id: id })
+    auctionItem = await AuctionItem.findOne({ _id: id }).populate('eventId')
     if (!auctionItem) return res.status(404).json({ error: "Item Not Found" })
   } catch (error) {
     return res.status(500).json({ error: "Error Loading Item" })

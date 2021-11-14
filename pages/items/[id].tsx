@@ -306,7 +306,7 @@ export default function EditItemPage() {
       <p>
         <a
           href={`/api/items/${auctionItem?._id}/qr?${QRHash}`}
-          download={`Lot-${QRHash}.png`}
+          download={`Lot-${auctionItem?.lotNumber}-QR.png`}
         >
           <img
             src={`/api/items/${auctionItem?._id}/qr?${QRHash}`}

@@ -18,6 +18,7 @@ export default function EditItemPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>()
   const [previewImage, setPreviewImage] = useState("")
   const [dataModified, setDataModified] = useState(false)
+  const [QRHash, setQRHash] = useState(0)
 
   const getAuctionItem = async () => {
     setLoading(true)
@@ -26,6 +27,7 @@ export default function EditItemPage() {
       let response = await axios.get(`/api/items/${id}`)
       setAuctionItem(response.data.auctionItem)
       setDataModified(false)
+      setQRHash(auctionItem?.lotNumber || 0)
     } catch (error) {
       console.error({ error })
     } finally {
@@ -60,6 +62,7 @@ export default function EditItemPage() {
 
       resetImage()
       setDataModified(false)
+      setQRHash(auctionItem?.lotNumber || 0)
     } catch (error: any) {
       try {
         setErrorMessage(`Error: ${error.response.data.error}`)
@@ -295,6 +298,24 @@ export default function EditItemPage() {
           </form>
         </>
       )}
+
+      <br />
+      <h2>QR Code</h2>
+      <hr />
+      <i>Event URL and Lot Number must be set to generate QR Coder</i>
+      <p>
+        <a
+          href={`/api/items/${auctionItem?._id}/qr?${QRHash}`}
+          download={`Lot-${QRHash}.png`}
+        >
+          <img
+            src={`/api/items/${auctionItem?._id}/qr?${QRHash}`}
+            width="50%"
+          />
+          <br />
+          Download
+        </a>
+      </p>
     </Layout>
   )
 }

@@ -1,11 +1,11 @@
-import type { ApiRequest, ApiResponse } from "../../../types/api"
-import runMiddleware from "../../../middleware/runMiddleware"
-import getCurrentUser from "../../../middleware/getCurrentUser"
-import connectToDB from "../../../middleware/connectToDB"
+import type { ApiRequest, ApiResponse } from "../../../../types/api"
+import runMiddleware from "../../../../middleware/runMiddleware"
+import getCurrentUser from "../../../../middleware/getCurrentUser"
+import connectToDB from "../../../../middleware/connectToDB"
 import multer from "multer"
-import uploadCoudinaryImage from "../../../lib/cloudinary"
-import AuctionItem from "../../../models/AuctionItem"
-import AuctionEvent from "../../../models/AuctionEvent"
+import uploadCoudinaryImage from "../../../../lib/cloudinary"
+import AuctionItem from "../../../../models/AuctionItem"
+import AuctionEvent from "../../../../models/AuctionEvent"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, multer().single("file"))

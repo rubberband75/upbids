@@ -3,6 +3,7 @@ import runMiddleware from "../../../../../middleware/runMiddleware"
 import AuctionEvent from "../../../../../models/AuctionEvent"
 import connectToDB from "../../../../../middleware/connectToDB"
 import AuctionItem from "../../../../../models/AuctionItem"
+import Bid from "../../../../../models/Bid"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, connectToDB)
@@ -31,18 +32,23 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
     case "GET":
       try {
         // Load published items associated with this event
-        let auctionItem: AuctionItem[] = await AuctionItem.findOne({
+        let auctionItem: AuctionItem = await AuctionItem.findOne({
           eventId: auctionEvent._id,
           published: true,
           lotNumber: lotNumber,
-        })
+        }).populate({ path: "eventId", select: "-description -userId " })
 
         // Throw 404 if no public item found with this lot number
         if (!auctionItem)
           return res.status(404).json({ error: "Item Not Found" })
 
+        let currentBid: Bid = await Bid.findOne({
+          itemId: auctionItem._id,
+          isTopBid: true,
+        })
+
         // Return auctionItem
-        return res.json(auctionItem)
+        return res.json({ auctionItem, currentBid })
       } catch (error: any) {
         return res.status(500).json({ error: "Error Loading Item" })
       }

@@ -1,5 +1,7 @@
 body {
-  font-family: -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-family: -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans,
+    sans-serif, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   padding: 0 1rem 1rem 1rem;
   max-width: 680px;
   margin: 0 auto;
@@ -25,7 +27,7 @@ iframe {
   border: 1px solid #ccc;
   height: 10rem;
   width: 100%;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   filter: invert(1);
 }
 
@@ -33,8 +35,14 @@ fieldset {
   border-radius: 15px;
 }
 
-input[type=text], input[type=email], input[type=tel], input[type=number], textarea {
-  font-family: -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+textarea {
+  font-family: -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans,
+    sans-serif, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-size: 1em;
   width: 100%;
   padding: 12px 20px;
@@ -43,7 +51,7 @@ input[type=text], input[type=email], input[type=tel], input[type=number], textar
   border-radius: 10px;
 }
 
-input[type=number] {
+input[type="number"] {
   width: 50%;
 }
 
@@ -52,8 +60,12 @@ label {
   font-weight: 300;
 }
 
-input[type=button], input[type=submit], input[type=reset],
-button[type=button], button[type=submit], button[type=reset] {
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+button[type="button"],
+button[type="submit"],
+button[type="reset"] {
   background-color: #2d50ec;
   border: none;
   color: white;
@@ -98,23 +110,37 @@ button[type=button], button[type=submit], button[type=reset] {
   padding: 0 1em !important;
 }
 
-.error-message{
+.error-message {
   color: rgb(219, 72, 72);
   border: solid 1px rgb(219, 72, 72);
   padding: 1em;
 }
 
-.card{
+.card {
   padding: 1em;
-  margin: .5em;
+  margin: 0.5em;
   border-radius: 10px;
-  border: solid 1px gray
+  border: solid 1px gray;
+  line-height: 1.5em;
 }
 
-a .card {
+.text-decoration-none {
   text-decoration: none !important;
 }
 
 a:hover > .card {
   background-color: #eeeeeeee;
+}
+
+.upbids-table {
+  width: 100%;
+}
+
+.upbids-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.upbids-table td, .upbids-table th {
+  padding: 15px;
+  text-align: left;
 }

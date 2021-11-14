@@ -1,8 +1,6 @@
 import Layout from "../../components/layout"
 import React, { useEffect, useState, useRef } from "react"
 import Bid from "../../models/Bid"
-import AuctionItem from "../../models/AuctionItem"
-import AuctionEvent from "../../models/AuctionEvent"
 import axios from "axios"
 
 export default function MyBidsPage() {
@@ -29,14 +27,14 @@ export default function MyBidsPage() {
     loadBids()
   }, [])
 
-  var currencyFormatter = new Intl.NumberFormat("en-US", {
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-
-    // These options are needed to round to whole numbers if that's what you want.
-    minimumFractionDigits: 2, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
-    maximumFractionDigits: 2, // (causes 2500.99 to be printed as $2,501)
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   })
+
+  const dateTimeFormatter = new Intl.DateTimeFormat("en-US", {})
 
   return (
     <Layout>
@@ -45,11 +43,15 @@ export default function MyBidsPage() {
       <h2>Active Bids</h2>
       <hr />
       {loading && <i style={{ color: "grey" }}>Loading...</i>}
-      {!loading && activeBids === [] && <i style={{ color: "grey" }}>None</i>}
-      {activeBids.map(({ amount, isTopBid, itemId }) => {
+      {!loading && !activeBids.length && <i style={{ color: "grey" }}>None</i>}
+      {activeBids.map(({ _id, amount, isTopBid, itemId }) => {
         if (typeof itemId === "object" && typeof itemId.eventId == "object") {
           return (
-            <a href={`/${itemId.eventId.slug}/${itemId.lotNumber}`}>
+            <a
+              href={`/${itemId.eventId.slug}/${itemId.lotNumber}`}
+              className={"text-decoration-none"}
+              key={_id}
+            >
               <div className={"card"}>
                 <small>{itemId.eventId.title}</small> <br />
                 <b>
@@ -67,17 +69,73 @@ export default function MyBidsPage() {
       <br />
       <br />
 
-      <h2>Won Item</h2>
+      <h2>Won Items</h2>
       <hr />
       {loading && <i style={{ color: "grey" }}>Loading...</i>}
-      {!loading && wonItems === [] && <i style={{ color: "grey" }}>None</i>}
+      {!loading && !wonItems.length && <i style={{ color: "grey" }}>None</i>}
+      {wonItems.map(({ _id, amount, itemId }) => {
+        if (typeof itemId === "object" && typeof itemId.eventId == "object") {
+          return (
+            <div key={_id} className={"card"}>
+              <small>{itemId.eventId.title}</small> <br />
+              <b>
+                Lot #{itemId.lotNumber?.toString().padStart(3, "0")} -{" "}
+                {itemId.title}
+              </b>
+              <br />
+              {currencyFormatter.format(amount)} <br />
+            </div>
+          )
+        }
+      })}
       <br />
       <br />
 
       <h2>Bid History</h2>
       <hr />
       {loading && <i style={{ color: "grey" }}>Loading...</i>}
-      {!loading && bidHistory === [] && <i style={{ color: "grey" }}>None</i>}
+      <table className="upbids-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Auction</th>
+            <th>Item</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {bidHistory.map(
+            ({ _id, timestamp, amount, won, isTopBid, itemId }) => {
+              if (
+                typeof itemId === "object" &&
+                typeof itemId.eventId == "object"
+              ) {
+                return (
+                  <tr key={_id}>
+                    <td
+                      dangerouslySetInnerHTML={{
+                        __html: new Date(timestamp)
+                          .toLocaleString("en-US")
+                          .split(", ")
+                          .join("<br />"),
+                      }}
+                    ></td>
+                    <td>{itemId.eventId.title}</td>
+                    <td>
+                      Lot #{itemId.lotNumber?.toString().padStart(3, "0")}
+                      {" - "}
+                      {itemId.title}
+                    </td>
+                    <td>{currencyFormatter.format(amount)}</td>
+                    <td>{won ? "Won" : isTopBid ? "Top Bid" : "Outbid"}</td>
+                  </tr>
+                )
+              }
+            }
+          )}
+        </tbody>
+      </table>
       <br />
       <br />
     </Layout>

@@ -1,3 +1,4 @@
+import Layout from "../../components/layout"
 import axios from "axios"
 import AuctionEvent from "../../models/AuctionEvent"
 import AuctionItem from "../../models/AuctionItem"
@@ -12,8 +13,15 @@ function Page({
   auctionEvent: AuctionEvent
   auctionItems: AuctionItem[]
 }) {
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+
   return (
-    <>
+    <Layout>
       <div
         style={{ backgroundImage: `url(${auctionEvent.bannerImage})` }}
         className={"bannerImage"}
@@ -25,18 +33,33 @@ function Page({
       <br />
       <h2>Auction Items</h2>
       <hr />
-      <ul>
-        {auctionItems.map(({ _id, title, lotNumber }) => (
-          <li key={_id}>
-            <Link href={`/${slug}/${lotNumber}`}>
-              <a>
-                #{lotNumber} - {title}
-              </a>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </>
+      {auctionItems.map(({ _id, title, image, lotNumber, retailValue }) => (
+        <Link key={_id} href={`/${slug}/${lotNumber}`}>
+          <a className={"text-decoration-none"}>
+            <div className={"card"} style={{ display: "flex" }}>
+              <div
+                style={{
+                  backgroundImage: `url(${image})`,
+                  width: "150px",
+                  height: "150px",
+                }}
+                className={"bannerImage"}
+              ></div>
+
+              <p style={{ margin: "0 2em" }}>
+                Lot #{lotNumber?.toString().padStart(3, "0")}
+                <h2>{title}</h2>
+                <span>
+                  <small>Retail Value</small>
+                  <br />
+                  {currencyFormatter.format(Number(retailValue))}
+                </span>
+              </p>
+            </div>
+          </a>
+        </Link>
+      ))}
+    </Layout>
   )
 }
 

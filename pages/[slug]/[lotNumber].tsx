@@ -1,3 +1,4 @@
+import Layout from "../../components/layout"
 import axios from "axios"
 import AuctionItem from "../../models/AuctionItem"
 
@@ -8,14 +9,17 @@ function Page({
   slug: string
   auctionItem: AuctionItem
 }) {
-  const minNextBid = (
+  const minNextBid =
     (auctionItem.startingBid || 0) + (auctionItem.minimunIncrement || 0)
-  ).toLocaleString("en-US", {
+
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   })
   return (
-    <>
+    <Layout>
       <p>
         <a href={`/${slug}`}> {"<-"} All Items</a>
       </p>
@@ -31,25 +35,32 @@ function Page({
       <br />
       <br />
       <h1>{auctionItem.title}</h1>
-      <h2>Lot #{auctionItem.lotNumber}</h2>
-      <i>Retail Value: ${auctionItem.retailValue}</i>
+      <h2>Lot #{auctionItem.lotNumber?.toString().padStart(3, "0")}</h2>
+      <i>
+        Retail Value:{" "}
+        {currencyFormatter.format(Number(auctionItem.retailValue))}
+      </i>
       <p>{auctionItem.description}</p>
       <br />
       <br />
 
-      <h2>Current Bid: ${auctionItem.startingBid}</h2>
+      <h2>
+        Current Bid: {currencyFormatter.format(Number(auctionItem.startingBid))}
+      </h2>
       <label htmlFor="bid">
-        <small>Minimum Bid: {minNextBid}</small>
+        <small>Minimum Bid: {currencyFormatter.format(minNextBid)}</small>
       </label>
+      <br />
       <input
-        type="text"
+        type="number"
         name="bid"
-        disabled
-        value={parseFloat(minNextBid.substr(1))}
+        value={minNextBid.toFixed(2)}
+        step="0.01"
+        placeholder="0.00"
       ></input>
 
       <button type="button">Place Bid</button>
-    </>
+    </Layout>
   )
 }
 

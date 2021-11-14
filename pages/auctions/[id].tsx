@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import Link from "next/link"
 import AuctionItem from "../../models/AuctionItem"
+import AuctionEvent from "../../models/AuctionEvent"
 
 export default function EditAuctionPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -149,6 +150,13 @@ export default function EditAuctionPage() {
       setLoading(false)
     }
   }
+
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
 
   return (
     <Layout>
@@ -314,15 +322,32 @@ export default function EditAuctionPage() {
               <i>You haven't added any auction items</i>
             </div>
           )}
-          <ul>
-            {auctionItems.map(({ _id, title }) => (
-              <li key={_id}>
-                <Link href={`/items/${_id}`}>
-                  <a>{title}</a>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {auctionItems.map(({ _id, title, image, lotNumber, retailValue }) => (
+            <Link href={`/items/${_id}`}>
+              <a className={"text-decoration-none"}>
+                <div className={"card"} style={{ display: "flex" }}>
+                  <div
+                    style={{
+                      backgroundImage: `url(${image})`,
+                      width: "150px",
+                      height: "150px",
+                    }}
+                    className={"bannerImage"}
+                  ></div>
+
+                  <p style={{ margin: "0 2em" }}>
+                    Lot #{lotNumber?.toString().padStart(3, "0")}
+                    <h2>{title}</h2>
+                    <span>
+                      <small>Retail Value</small>
+                      <br />
+                      {currencyFormatter.format(Number(retailValue))}
+                    </span>
+                  </p>
+                </div>
+              </a>
+            </Link>
+          ))}
           <Link href={`/items/new?eventId=${id}`}>
             <button type="button">+ Add Item</button>
           </Link>

@@ -35,7 +35,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       try {
         // Extract fields from req body
         console.log({ body: req.body })
-        let { amount, isTopBid, won, notified, payed } = req.body || {}
+        let { amount, isTopBid, won, notified, paid } = req.body || {}
 
         // TODO: Check for equal/greter bid amounts on same item
 
@@ -43,7 +43,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         if (isTopBid != undefined) bid.isTopBid = isTopBid
         if (won != undefined) bid.won = won
         if (notified != undefined) bid.notified = notified
-        if (payed != undefined) bid.payed = payed
+        if (paid != undefined) bid.paid = paid
 
         bid.save()
         return res.json({ bid })

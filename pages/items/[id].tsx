@@ -5,6 +5,7 @@ import axios from "axios"
 import Link from "next/link"
 import AuctionItem from "../../models/AuctionItem"
 import AuctionEvent from "../../models/AuctionEvent"
+import Bid from "../../models/Bid"
 
 export default function EditItemPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -16,6 +17,7 @@ export default function EditItemPage() {
   let [errorMessage, setErrorMessage] = useState("")
   let [auctionItem, setAuctionItem] = useState<AuctionItem>()
   let [auctionEvent, setAuctionEvent] = useState<AuctionEvent>()
+  let [bids, setBids] = useState<Bid[]>([])
 
   const [selectedFile, setSelectedFile] = useState<File | null>()
   const [previewImage, setPreviewImage] = useState("")
@@ -38,9 +40,43 @@ export default function EditItemPage() {
       setLoading(false)
     }
   }
+
+  const loadBids = async () => {
+    try {
+      let response = await axios.get(`/api/items/${id}/bids`)
+      setBids(response.data.bids)
+    } catch (error) {
+      console.error("Error Laoding Bids:", error)
+    }
+  }
+
+  const togglePaid = async (bidId: string, currentStatus: Boolean) => {
+    if (bids && bids.length) {
+      let upadatedBids = [...bids]
+      upadatedBids[0].paid = !currentStatus
+      setBids(upadatedBids)
+    }
+
+    try {
+      await axios.patch(`/api/bids/${bidId}`, { paid: !currentStatus })
+    } catch (error) {}
+  }
+
+  const removeBid = async (bidId: string) => {
+    if (bids && bids.length) {
+      let filteredBids = [...bids].filter(({ _id }) => _id != bidId)
+      setBids(filteredBids)
+    }
+
+    try {
+      await axios.delete(`/api/bids/${bidId}`)
+    } catch (error) {}
+  }
+
   useEffect(() => {
     if (!router.isReady) return
     getAuctionItem()
+    loadBids()
   }, [router.isReady])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -126,6 +162,13 @@ export default function EditItemPage() {
       setLoading(false)
     }
   }
+
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
 
   return (
     <Layout>
@@ -341,6 +384,73 @@ export default function EditItemPage() {
           </a>
         </p>
       )}
+
+      <br />
+      <br />
+      <h2>Bid History</h2>
+      <hr />
+      <table className="upbids-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Paid</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          {bids.map(
+            ({ _id, timestamp, amount, won, isTopBid, paid, userId }) => {
+              if (typeof userId === "object") {
+                return (
+                  <tr key={_id}>
+                    <td
+                      dangerouslySetInnerHTML={{
+                        __html: new Date(timestamp)
+                          .toLocaleString("en-US")
+                          .split(", ")
+                          .join("<br />"),
+                      }}
+                    ></td>
+                    <td>{userId.name}</td>
+                    <td>{currencyFormatter.format(amount)}</td>
+                    <td>
+                      {_id && (
+                        <input
+                          type="checkbox"
+                          name={_id}
+                          disabled={!!!isTopBid}
+                          checked={!!paid}
+                          onChange={async (e) => {
+                            await togglePaid(e.currentTarget.name, !!paid)
+                            loadBids()
+                          }}
+                        />
+                      )}
+                    </td>
+                    <td>
+                      {_id && (
+                        <button
+                          type="button"
+                          name={_id}
+                          className={"text-button"}
+                          onClick={async (e) => {
+                            await removeBid(e.currentTarget.name)
+                            loadBids()
+                          }}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                )
+              }
+            }
+          )}
+        </tbody>
+      </table>
 
       <br />
       <br />

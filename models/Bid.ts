@@ -11,7 +11,7 @@ interface Bid extends mongoose.Document {
   isTopBid: Boolean
   won: Boolean
   notified: Boolean
-  payed: Boolean
+  paid: Boolean
 }
 
 const bidSchema = new Schema({
@@ -50,7 +50,7 @@ const bidSchema = new Schema({
     required: true,
     default: false,
   },
-  payed: {
+  paid: {
     type: Boolean,
     required: true,
     default: false,

@@ -13,6 +13,15 @@ function LotNumberPage({
   auctionItem: AuctionItem
   currentBid: Bid
 }) {
+  let [user, setUser] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  })
+  const handleChange = (e: React.FormEvent<HTMLInputElement>): void => {
+    setUser({ ...user, [e.currentTarget.name]: e.currentTarget.value })
+  }
+
   const [bidAmount, setBidAmount] = useState(
     !currentBid
       ? auctionItem?.startingBid || 0
@@ -32,14 +41,27 @@ function LotNumberPage({
 
   const placeBid = async () => {
     try {
-      console.log("Placing Bid:", {
+      await axios.post("/api/bids/place-bid", {
         itemId: auctionItem?._id,
         amount: bidAmount,
       })
-      let response = await axios.post("/api/bids/place-bid", {
+      window.location.reload()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const placeGuestBid = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    try {
+      await axios.post("/api/bids/place-bid", {
         itemId: auctionItem?._id,
         amount: bidAmount,
+        fullName: user.name,
+        email: user.email,
+        phone: user.phone,
       })
+      window.location.reload()
     } catch (error) {
       console.error(error)
     }
@@ -102,6 +124,55 @@ function LotNumberPage({
       <button type="button" onClick={placeBid}>
         Place Bid
       </button>
+
+      <br />
+      <br />
+      <form onSubmit={placeGuestBid}>
+        <fieldset>
+          <legend>Bid Without an account</legend>
+          <p>
+            <label htmlFor="name">
+              <span>Full Name</span>
+            </label>
+            <br />
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={user.name}
+              onChange={handleChange}
+            />
+          </p>
+          <p>
+            <label htmlFor="email">
+              <span>Email Address</span>
+            </label>
+            <br />
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={user.email}
+              onChange={handleChange}
+            />
+          </p>
+          <p>
+            <label htmlFor="phone">
+              <span>Phone Number</span>
+            </label>
+            <br />
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={user.phone}
+              onChange={handleChange}
+            />
+          </p>
+
+          <button type="submit">Place Guest Bid</button>
+        </fieldset>
+      </form>
     </Layout>
   )
 }

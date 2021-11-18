@@ -1,3 +1,27 @@
+.profilePicture {
+  border-radius: 5px;
+  float: left;
+  height: 16em;
+  width: 16em;
+  display: block;
+  background-color: #f7f7f7;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.bannerImage {
+  border-radius: 5px;
+  float: left;
+  height: 16em;
+  width: 100%;
+  display: block;
+  background-color: #f7f7f7;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
 /* body {
   font-family: -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans,
     sans-serif, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif,

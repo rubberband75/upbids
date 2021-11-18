@@ -3,6 +3,16 @@ import axios from "axios"
 import AuctionItem from "../../models/AuctionItem"
 import Bid from "../../models/Bid"
 import { useState } from "react"
+import { signIn, useSession } from "next-auth/react"
+import {
+  Button,
+  Divider,
+  Input,
+  InputAdornment,
+  OutlinedInput,
+  TextField,
+} from "@mui/material"
+import Link from "next/link"
 
 function LotNumberPage({
   slug,
@@ -13,12 +23,16 @@ function LotNumberPage({
   auctionItem: AuctionItem
   currentBid: Bid
 }) {
+  const { data: session, status } = useSession()
+
   let [user, setUser] = useState({
     name: "",
     email: "",
     phone: "",
   })
-  const handleChange = (e: React.FormEvent<HTMLInputElement>): void => {
+  const handleChange = (
+    e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
+  ): void => {
     setUser({ ...user, [e.currentTarget.name]: e.currentTarget.value })
   }
 
@@ -103,76 +117,113 @@ function LotNumberPage({
           </>
         )}
       </h2>
-      <label htmlFor="bid">
-        <small>
-          Minimum Bid: {currencyFormatter.format(Number(minNextBid))}
-        </small>
-      </label>
-      <br />
-      <input
-        type="number"
-        name="bid"
-        value={bidAmount.toFixed(2)}
-        onChange={(e) => {
-          setBidAmount(Number(e.currentTarget.value))
-        }}
-        step="0.01"
-        placeholder="0.00"
-        min={minNextBid.toFixed(2)}
-      ></input>
 
-      <button type="button" onClick={placeBid}>
-        Place Bid
-      </button>
+      {typeof auctionItem.eventId === "object" &&
+      !auctionItem.eventId.biddingOpen ? (
+        <i>Bidding Not Yet Open</i>
+      ) : (
+        <>
+          <label htmlFor="bid">
+            <small>
+              Minimum Bid: {currencyFormatter.format(Number(minNextBid))}
+            </small>
+          </label>
+          <br />
+          <OutlinedInput
+            id="bid"
+            type="number"
+            name="bid"
+            value={bidAmount}
+            onChange={(e) => {
+              setBidAmount(Number(e.currentTarget.value))
+            }}
+            // step="0.01"
+            // placeholder="0.00"
+            // min={minNextBid.toFixed(2)}
+            startAdornment={<InputAdornment position="start">$</InputAdornment>}
+          />
+          {session && (
+            <>
+              <br />
+              <Button variant="contained" size="large" onClick={placeBid}>
+                Place Bid
+              </Button>
+            </>
+          )}
+          {!session && (
+            <>
+              <br />
+              <br />
+              <Link href={`/api/auth/signin`}>
+                <Button
+                  variant="contained"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    signIn()
+                  }}
+                >
+                  Sign in To Place Bid
+                </Button>
+              </Link>
 
-      <br />
-      <br />
-      <form onSubmit={placeGuestBid}>
-        <fieldset>
-          <legend>Bid Without an account</legend>
-          <p>
-            <label htmlFor="name">
-              <span>Full Name</span>
-            </label>
-            <br />
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={user.name}
-              onChange={handleChange}
-            />
-          </p>
-          <p>
-            <label htmlFor="email">
-              <span>Email Address</span>
-            </label>
-            <br />
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={user.email}
-              onChange={handleChange}
-            />
-          </p>
-          <p>
-            <label htmlFor="phone">
-              <span>Phone Number</span>
-            </label>
-            <br />
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              value={user.phone}
-              onChange={handleChange}
-            />
-          </p>
+              <br />
+              <br />
+              <Divider />
 
-          <button type="submit">Place Guest Bid</button>
-        </fieldset>
-      </form>
+              <br />
+              <br />
+              <form onSubmit={placeGuestBid}>
+                <fieldset>
+                  <legend>Bid Without an account</legend>
+                  <p>
+                    <label htmlFor="name">
+                      <span>Full Name</span>
+                    </label>
+                    <br />
+                    <OutlinedInput
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={user.name}
+                      onChange={handleChange}
+                    />
+                  </p>
+                  <p>
+                    <label htmlFor="email">
+                      <span>Email Address</span>
+                    </label>
+                    <br />
+                    <OutlinedInput
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={user.email}
+                      onChange={handleChange}
+                    />
+                  </p>
+                  <p>
+                    <label htmlFor="phone">
+                      <span>Phone Number</span>
+                    </label>
+                    <br />
+                    <OutlinedInput
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={user.phone}
+                      onChange={handleChange}
+                    />
+                  </p>
+
+                  <Button variant="contained" type="submit">
+                    Place Guest Bid
+                  </Button>
+                </fieldset>
+              </form>
+            </>
+          )}
+        </>
+      )}
     </Layout>
   )
 }

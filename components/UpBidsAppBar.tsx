@@ -12,17 +12,26 @@ import { signIn, signOut, useSession } from "next-auth/react"
 import {
   Avatar,
   Button,
+  Drawer,
+  List,
   ListItem,
   ListItemAvatar,
+  ListItemButton,
+  ListItemIcon,
   ListItemText,
 } from "@mui/material"
 import Divider from "@mui/material/Divider"
+import PersonIcon from "@mui/icons-material/Person"
+import EventIcon from "@mui/icons-material/Event"
+import LoyaltyIcon from "@mui/icons-material/Loyalty"
+import ExploreIcon from "@mui/icons-material/Explore"
 
 export default function UpBidsAppBar() {
   const { data: session, status } = useSession()
   const loading = status === "loading"
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [showDrawer, setShowDrawer] = React.useState(false)
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -30,6 +39,17 @@ export default function UpBidsAppBar() {
 
   const handleClose = () => {
     setAnchorEl(null)
+  }
+
+  const toggleDrawer = (event: React.KeyboardEvent | React.MouseEvent) => {
+    if (
+      event.type === "keydown" &&
+      ((event as React.KeyboardEvent).key === "Tab" ||
+        (event as React.KeyboardEvent).key === "Shift")
+    ) {
+      return
+    }
+    setShowDrawer(!showDrawer)
   }
 
   return (
@@ -41,6 +61,9 @@ export default function UpBidsAppBar() {
           color="inherit"
           aria-label="menu"
           sx={{ mr: 2 }}
+          onClick={() => {
+            setShowDrawer(true)
+          }}
         >
           <MenuIcon />
         </IconButton>
@@ -134,6 +157,66 @@ export default function UpBidsAppBar() {
           </>
         )}
       </Toolbar>
+      <Drawer anchor="left" open={showDrawer} onClose={toggleDrawer}>
+        <List sx={{ minWidth: "15em" }}>
+          {!session && (
+            <ListItem disablePadding>
+              <ListItemButton
+                href={`/api/auth/signin`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  signIn()
+                }}
+              >
+                <ListItemIcon>
+                  <PersonIcon />
+                </ListItemIcon>
+                <ListItemText primary="Sign In" />
+              </ListItemButton>
+            </ListItem>
+          )}
+
+          {session && (
+            <>
+              <ListItem disablePadding>
+                <ListItemButton component="a" href="/account">
+                  <ListItemIcon>
+                    <PersonIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="My Account" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton component="a" href="/auctions">
+                  <ListItemIcon>
+                    <EventIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="My Auctions" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton component="a" href="/bids">
+                  <ListItemIcon>
+                    <LoyaltyIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="My Bids" />
+                </ListItemButton>
+              </ListItem>
+            </>
+          )}
+
+          <Divider />
+
+          <ListItem disablePadding>
+            <ListItemButton component="a" href="/discover">
+              <ListItemIcon>
+                <ExploreIcon />
+              </ListItemIcon>
+              <ListItemText primary="Discover" />
+            </ListItemButton>
+          </ListItem>
+        </List>
+      </Drawer>
     </AppBar>
   )
 }

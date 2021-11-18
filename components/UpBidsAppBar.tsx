@@ -131,18 +131,30 @@ export default function UpBidsAppBar() {
                 </Link>
                 <Divider />
                 <Link href="/account">
-                  <MenuItem onClick={handleClose}>My Account</MenuItem>
+                  <MenuItem component="a" href="/account" onClick={handleClose}>
+                    My Account
+                  </MenuItem>
                 </Link>
                 <Link href="/auctions">
-                  <MenuItem onClick={handleClose}>My Auctions</MenuItem>
+                  <MenuItem
+                    component="a"
+                    href="/auctions"
+                    onClick={handleClose}
+                  >
+                    My Auctions
+                  </MenuItem>
                 </Link>
                 <Link href="/bids">
-                  <MenuItem onClick={handleClose}>My Bids</MenuItem>
+                  <MenuItem component="a" href="/bids" onClick={handleClose}>
+                    My Bids
+                  </MenuItem>
                 </Link>
 
                 <Divider />
                 <Link href={`/api/auth/signout`}>
                   <MenuItem
+                    component="a"
+                    href="/api/auth/signout"
                     onClick={(e) => {
                       e.preventDefault()
                       signOut()

@@ -1,14 +1,12 @@
-import { SessionProvider } from "next-auth/react"
-import type { AppProps } from "next/app"
-import "./styles.css"
-
 import * as React from "react"
-import Head from "next/head"
+import type { AppProps } from "next/app"
+import { SessionProvider } from "next-auth/react"
 import { ThemeProvider } from "@mui/material/styles"
-import CssBaseline from "@mui/material/CssBaseline"
 import { CacheProvider, EmotionCache } from "@emotion/react"
-import theme from "../components/theme"
 import createEmotionCache from "../components/createEmotionCache"
+import CssBaseline from "@mui/material/CssBaseline"
+import theme from "../components/theme"
+import Head from "next/head"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()

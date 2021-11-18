@@ -1,5 +1,8 @@
 import Header from "./header"
-import Footer from "./footer"
+import UpBidsAppBar from "./UpBidsAppBar"
+import UpBidsFooter from "./UpBidsFooter"
+import { Container } from "@mui/material"
+import { Box } from "@mui/system"
 
 interface LayoutProps {
   children: React.ReactNode
@@ -8,9 +11,21 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   return (
     <>
-      <Header />
-      <main>{children}</main>
-      <Footer />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+        }}
+      >
+        <UpBidsAppBar />
+        <Header />
+
+        <Container component="main" sx={{ mt: 2, mb: 2 }} maxWidth="sm">
+          {children}
+        </Container>
+        <UpBidsFooter />
+      </Box>
     </>
   )
 }

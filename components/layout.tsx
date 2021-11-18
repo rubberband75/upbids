@@ -1,4 +1,3 @@
-import Header from "./header"
 import UpBidsAppBar from "./UpBidsAppBar"
 import UpBidsFooter from "./UpBidsFooter"
 import { Container } from "@mui/material"
@@ -20,8 +19,7 @@ export default function Layout({ children }: LayoutProps) {
       >
         <UpBidsAppBar />
 
-        <Container component="main" sx={{ mt: 0, mb: 2 }} maxWidth="sm">
-          <Header />
+        <Container component="main" sx={{ mt: 8, mb: 2 }} maxWidth="sm">
           {children}
         </Container>
         <UpBidsFooter />

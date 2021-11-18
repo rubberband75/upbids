@@ -1,7 +1,6 @@
 import * as React from "react"
 import { useRouter } from "next/router"
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material"
-import { Box } from "@mui/system"
 
 import PersonIcon from "@mui/icons-material/Person"
 import LoyaltyIcon from "@mui/icons-material/Loyalty"
@@ -30,33 +29,34 @@ export default function UpBidsFooter() {
   }, [router.isReady])
 
   return (
-    <Box component="footer" sx={{ mt: "auto" }}>
-      <Paper elevation={4}>
-        <BottomNavigation
-          showLabels
-          value={value}
-          onChange={(_event, newValue) => {
-            setValue(newValue)
-            switch (newValue) {
-              case 0:
-                router.push("/account")
-                break
-              case 1:
-                router.push("/bids")
-                break
-              case 2:
-                router.push("/discover")
-                break
-              default:
-                break
-            }
-          }}
-        >
-          <BottomNavigationAction label="Account" icon={<PersonIcon />} />
-          <BottomNavigationAction label="My Bids" icon={<LoyaltyIcon />} />
-          <BottomNavigationAction label="Discover" icon={<ExploreIcon />} />
-        </BottomNavigation>
-      </Paper>
-    </Box>
+    <Paper
+      sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}
+      elevation={4}
+    >
+      <BottomNavigation
+        showLabels
+        value={value}
+        onChange={(_event, newValue) => {
+          setValue(newValue)
+          switch (newValue) {
+            case 0:
+              router.push("/account")
+              break
+            case 1:
+              router.push("/bids")
+              break
+            case 2:
+              router.push("/discover")
+              break
+            default:
+              break
+          }
+        }}
+      >
+        <BottomNavigationAction label="Account" icon={<PersonIcon />} />
+        <BottomNavigationAction label="My Bids" icon={<LoyaltyIcon />} />
+        <BottomNavigationAction label="Discover" icon={<ExploreIcon />} />
+      </BottomNavigation>
+    </Paper>
   )
 }

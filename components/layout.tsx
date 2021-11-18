@@ -19,7 +19,7 @@ export default function Layout({ children }: LayoutProps) {
       >
         <UpBidsAppBar />
 
-        <Container component="main" sx={{ mt: 8, mb: 2 }} maxWidth="sm">
+        <Container component="main" sx={{ mt: 8, mb: 10 }} maxWidth="sm">
           {children}
         </Container>
         <UpBidsFooter />

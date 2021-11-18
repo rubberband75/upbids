@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import Link from "next/link"
 import AuctionItem from "../../models/AuctionItem"
-import AuctionEvent from "../../models/AuctionEvent"
+import Card from "@mui/material/Card"
 
 export default function EditAuctionPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -325,7 +325,7 @@ export default function EditAuctionPage() {
           {auctionItems.map(({ _id, title, image, lotNumber, retailValue }) => (
             <Link href={`/items/${_id}`}>
               <a className={"text-decoration-none"}>
-                <div className={"card"} style={{ display: "flex" }}>
+                <Card variant="outlined">
                   <div
                     style={{
                       backgroundImage: `url(${image})`,
@@ -344,7 +344,7 @@ export default function EditAuctionPage() {
                       {currencyFormatter.format(Number(retailValue))}
                     </span>
                   </p>
-                </div>
+                </Card>
               </a>
             </Link>
           ))}

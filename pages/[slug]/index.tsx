@@ -3,6 +3,7 @@ import axios from "axios"
 import AuctionEvent from "../../models/AuctionEvent"
 import AuctionItem from "../../models/AuctionItem"
 import Link from "next/link"
+import Card from "@mui/material/Card"
 
 function Page({
   slug,
@@ -36,7 +37,7 @@ function Page({
       {auctionItems.map(({ _id, title, image, lotNumber, retailValue }) => (
         <Link key={_id} href={`/${slug}/${lotNumber}`}>
           <a className={"text-decoration-none"}>
-            <div className={"card"} style={{ display: "flex" }}>
+            <Card variant="outlined">
               <div
                 style={{
                   backgroundImage: `url(${image})`,
@@ -55,7 +56,7 @@ function Page({
                   {currencyFormatter.format(Number(retailValue))}
                 </span>
               </p>
-            </div>
+            </Card>
           </a>
         </Link>
       ))}

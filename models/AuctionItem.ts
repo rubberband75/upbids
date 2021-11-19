@@ -63,6 +63,6 @@ const auctionItem = new Schema({
 })
 
 var AuctionItem =
-  mongoose.models.AuctionItem || mongoose.model<AuctionItem>("AuctionItem", auctionItem)
+  mongoose.models?.AuctionItem || mongoose.model<AuctionItem>("AuctionItem", auctionItem)
 
 export default AuctionItem

@@ -50,6 +50,6 @@ const auctionEvent = new Schema({
   },
 })
 
-var AuctionEvent = mongoose.models.AuctionEvent || mongoose.model<AuctionEvent>("AuctionEvent", auctionEvent)
+var AuctionEvent = mongoose.models?.AuctionEvent || mongoose.model<AuctionEvent>("AuctionEvent", auctionEvent)
 
 export default AuctionEvent

@@ -5,7 +5,20 @@ import axios from "axios"
 import Link from "next/link"
 import AuctionItem from "../../models/AuctionItem"
 import Card from "@mui/material/Card"
-import { Button, Divider, Typography } from "@mui/material"
+import {
+  Button,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  InputAdornment,
+  Switch,
+  TextField,
+  Typography,
+} from "@mui/material"
 import LaunchIcon from "@mui/icons-material/Launch"
 import { Box } from "@mui/system"
 
@@ -107,7 +120,7 @@ export default function EditAuctionPage() {
   }
 
   const handleChange = (
-    e: React.FormEvent<HTMLInputElement> | React.FormEvent<HTMLTextAreaElement>
+    e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void => {
     setEvent({ ...event, [e.currentTarget.name]: e.currentTarget.value })
     setDataModified(true)
@@ -194,136 +207,138 @@ export default function EditAuctionPage() {
         // Account Data Form
         <>
           <form onSubmit={handleSubmit}>
-            <fieldset>
-              <legend>Auction Details</legend>
-              <div
-                style={{
-                  backgroundImage: `url(${previewImage || event.bannerImage})`,
-                }}
-                className={"bannerImage"}
-              ></div>
-              <br />
-              <p>
-                <input
-                  hidden
-                  type="file"
-                  accept="image/*"
-                  ref={imageInputRef}
-                  // value={selectedFile}
-                  onChange={updateImage}
-                />
-                <button
-                  type="button"
-                  style={{ padding: ".5em" }}
-                  onClick={() => imageInputRef.current.click()}
+            <Card>
+              <CardMedia
+                component="img"
+                height="250"
+                image={previewImage || event.bannerImage}
+              />
+
+              <CardContent>
+                <div>
+                  <input
+                    hidden
+                    type="file"
+                    accept="image/*"
+                    ref={imageInputRef}
+                    onChange={updateImage}
+                  />
+                  <Button
+                    variant="contained"
+                    type="button"
+                    size="small"
+                    onClick={() => imageInputRef.current.click()}
+                  >
+                    Update Image
+                  </Button>
+                  {event.bannerImage && (
+                    <Button
+                      type="button"
+                      size="small"
+                      onClick={deleteImage}
+                      sx={{ color: "rgb(219, 72, 72)" }}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                  {previewImage && (
+                    <Button type="button" size="small" onClick={resetImage}>
+                      Reset
+                    </Button>
+                  )}
+                </div>
+                <br />
+
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Title"
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={event.title}
+                    onChange={handleChange}
+                  />
+                </FormControl>
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Description"
+                    multiline
+                    id="description"
+                    name="description"
+                    rows={5}
+                    value={event.description}
+                    onChange={handleChange}
+                    placeholder="Auction Description..."
+                  />
+                </FormControl>
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Event URL"
+                    type="text"
+                    id="slug"
+                    name="slug"
+                    value={event.slug}
+                    onChange={handleChange}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <i>www.upbids.net/</i>
+                        </InputAdornment>
+                      ),
+                    }}
+                    placeholder="event-name"
+                  />
+                </FormControl>
+
+                <FormGroup>
+                  <FormControlLabel
+                    label="Published"
+                    control={
+                      <Switch
+                        checked={event.published}
+                        onChange={() => {
+                          setEvent({ ...event, published: !event.published })
+                          setDataModified(true)
+                        }}
+                      />
+                    }
+                  />
+                  <FormControlLabel
+                    label="Bidding Open"
+                    control={
+                      <Switch
+                        checked={event.biddingOpen}
+                        onChange={() => {
+                          setEvent({
+                            ...event,
+                            biddingOpen: !event.biddingOpen,
+                          })
+                          setDataModified(true)
+                        }}
+                      />
+                    }
+                  />
+                </FormGroup>
+              </CardContent>
+              <CardActions>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  disabled={!dataModified}
                 >
-                  Update Image
-                </button>
-                {event.bannerImage && (
-                  <button
+                  Save
+                </Button>
+                {dataModified && (
+                  <Button
                     type="button"
                     className={"text-button"}
-                    onClick={deleteImage}
+                    onClick={getEvent}
                   >
-                    Delete
-                  </button>
+                    Cancel
+                  </Button>
                 )}
-                {previewImage && (
-                  <button
-                    type="button"
-                    className={"text-button"}
-                    onClick={resetImage}
-                  >
-                    Reset
-                  </button>
-                )}
-              </p>
-              <p>
-                <label htmlFor="title">
-                  <span>Title</span>
-                </label>
-                <br />
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={event.title}
-                  onChange={handleChange}
-                />
-              </p>
-              <p>
-                <label htmlFor="description">
-                  <span>Description</span>
-                </label>
-                <br />
-
-                <textarea
-                  id="description"
-                  name="description"
-                  rows={5}
-                  value={event.description}
-                  onChange={handleChange}
-                  placeholder="Auction Description..."
-                ></textarea>
-              </p>
-              <p>
-                <label htmlFor="slug">
-                  <span>Event URL</span>
-                  <br />
-                  <i>
-                    Where guests can find this event. Example: www.upbids.net/
-                    <ins>event-url</ins>
-                  </i>
-                </label>
-                <br />
-                <input
-                  type="text"
-                  id="slug"
-                  name="slug"
-                  value={event.slug}
-                  onChange={handleChange}
-                />
-              </p>
-
-              <p>
-                <input
-                  type="checkbox"
-                  id="published"
-                  name="published"
-                  checked={event.published}
-                  onChange={() => {
-                    setEvent({ ...event, published: !event.published })
-                    setDataModified(true)
-                  }}
-                />
-                <label htmlFor="published">Published</label>
-              </p>
-
-              <p>
-                <input
-                  type="checkbox"
-                  id="biddingOpen"
-                  name="biddingOpen"
-                  checked={event.biddingOpen}
-                  onChange={() => {
-                    setEvent({ ...event, biddingOpen: !event.biddingOpen })
-                    setDataModified(true)
-                  }}
-                />
-                <label htmlFor="biddingOpen">Bidding Open</label>
-              </p>
-            </fieldset>
-            <br />
-            <button type="submit">Save</button>
-            {dataModified && (
-              <button
-                type="button"
-                className={"text-button"}
-                onClick={getEvent}
-              >
-                Cancel
-              </button>
-            )}
+              </CardActions>
+            </Card>
           </form>
 
           <br />
@@ -360,15 +375,19 @@ export default function EditAuctionPage() {
               </a>
             </Link>
           ))}
+          <br />
           <Link href={`/items/new?eventId=${id}`}>
-            <button type="button">+ Add Item</button>
+            <Button variant="contained" size="large">
+              + Add Item
+            </Button>
           </Link>
 
           <br />
           <br />
           <h2>Danger Zone</h2>
           <hr />
-          <button
+          <Button
+            variant="contained"
             type="button"
             style={{ backgroundColor: "#c11b1b" }}
             onClick={() => {
@@ -378,7 +397,7 @@ export default function EditAuctionPage() {
             }}
           >
             Delete Auction
-          </button>
+          </Button>
         </>
       )}
     </Layout>

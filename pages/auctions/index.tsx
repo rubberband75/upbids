@@ -2,7 +2,14 @@ import Layout from "../../components/layout"
 import React, { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import Link from "next/link"
-import { Divider, Typography } from "@mui/material"
+import {
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  Divider,
+  Typography,
+} from "@mui/material"
 
 export default function MyAuctions() {
   let [loading, setLoading] = useState(true)
@@ -39,19 +46,29 @@ export default function MyAuctions() {
       {/* // Account Data Form */}
       {!loading && (
         <>
-          {!auctions.length && <div><i>You haven't created any auctions</i></div>}
+          {!auctions.length && (
+            <div>
+              <i>You haven't created any auctions</i>
+            </div>
+          )}
 
-          <ul>
-            {auctions.map(({ _id, title }) => (
-              <li key={_id}>
-                <Link href={`/auctions/${_id}`}>
-                  <a>{title}</a>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {auctions.map(({ _id, title }) => (
+            <Link href={`/auctions/${_id}`} key={_id}>
+              <Card sx={{ my: 2 }}>
+                <CardActionArea>
+                  <CardContent>
+                    <Typography variant="h5" component="span" sx={{ my: 2 }}>
+                      {title}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Link>
+          ))}
           <Link href="/auctions/new">
-            <button type="button">+ Create New Auction</button>
+            <Button variant="contained" size="large">
+              + Create New Auction
+            </Button>
           </Link>
         </>
       )}

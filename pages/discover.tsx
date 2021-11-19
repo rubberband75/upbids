@@ -2,11 +2,26 @@ import Layout from "../components/layout"
 import React, { useEffect, useState } from "react"
 import axios from "axios"
 import Link from "next/link"
+import {
+  Alert,
+  Avatar,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardHeader,
+  CardMedia,
+  Chip,
+  Divider,
+  IconButton,
+  Skeleton,
+  Typography,
+} from "@mui/material"
+import AuctionEvent from "../models/AuctionEvent"
 
 export default function MyAuctions() {
   let [loading, setLoading] = useState(true)
   let [errorMessage, setErrorMessage] = useState("")
-  let [auctions, setAuctions] = useState<Array<any>>([])
+  let [auctions, setAuctions] = useState<AuctionEvent[]>([])
 
   const getAuctions = () => {
     setErrorMessage("")
@@ -27,29 +42,72 @@ export default function MyAuctions() {
 
   return (
     <Layout>
-      <h1>Discover Public Auctions</h1>
+      <Typography variant="h4" component="h1" sx={{ my: 2 }}>
+        Discover Public Auctions
+      </Typography>
+      <Divider />
       {/* // Error Message */}
-      {errorMessage && <p className={"error-message"}>{errorMessage}</p>}
+      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
       {/* // Loaing Message */}
-      {loading && <p>Loading...</p>}
+      {loading && (
+        <Card sx={{ my: 4 }}>
+          <Skeleton
+            sx={{ height: 175 }}
+            animation="wave"
+            variant="rectangular"
+          />
+          <CardContent>
+            <Typography variant="h4" sx={{ mb: 2 }}>
+              <Skeleton />
+            </Typography>
+            <Skeleton
+              animation="wave"
+              height={10}
+              style={{ marginBottom: 6 }}
+            />
+            <Skeleton animation="wave" height={10} width="80%" />
+          </CardContent>
+        </Card>
+      )}
       {/* // Account Data Form */}
       {!loading && (
         <>
           {!auctions.length && (
-            <div>
-              <i>There are currently no public auctions</i>
-            </div>
+            <Alert severity="info">
+              There are currently no public auctions
+            </Alert>
           )}
 
-          <ul>
-            {auctions.map(({ slug, title }) => (
-              <li key={slug}>
-                {/* <Link href={}> */}
-                <a href={`/${slug}`}>{title}</a>
-                {/* </Link> */}
-              </li>
-            ))}
-          </ul>
+          {auctions.map((auction: AuctionEvent) => (
+            <Link href={`/${auction.slug}`}>
+              <Card sx={{ my: 4 }}>
+                <CardActionArea>
+                  <CardMedia
+                    component="img"
+                    height="175"
+                    image={auction.bannerImage}
+                    alt="green iguana"
+                  />
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {auction.title}{"\t"}
+                      {auction.biddingOpen && (
+                        <Chip
+                          label="Bidding Open"
+                          color="primary"
+                          variant="outlined"
+                          size="small"
+                        />
+                      )}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {auction.description}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Link>
+          ))}
         </>
       )}
     </Layout>

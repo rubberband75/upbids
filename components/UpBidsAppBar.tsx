@@ -155,7 +155,7 @@ export default function UpBidsAppBar() {
                   <MenuItem
                     component="a"
                     href="/api/auth/signout"
-                    onClick={(e) => {
+                    onClick={(e: any) => {
                       e.preventDefault()
                       signOut()
                       handleClose()

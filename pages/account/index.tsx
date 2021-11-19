@@ -5,6 +5,14 @@ import Layout from "../../components/layout"
 import useSwr from "swr"
 import React, { useEffect, useState, useRef } from "react"
 import axios from "axios"
+import {
+  Alert,
+  Button,
+  Divider,
+  FormControl,
+  InputLabel,
+  TextField,
+} from "@mui/material"
 
 export default function AccountIndex() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -84,7 +92,9 @@ export default function AccountIndex() {
     updateUser()
   }
 
-  const handleChange = (e: React.FormEvent<HTMLInputElement>): void => {
+  const handleChange = (
+    e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
+  ): void => {
     setUser({ ...user, [e.currentTarget.name]: e.currentTarget.value })
     setDataModified(true)
   }
@@ -124,7 +134,7 @@ export default function AccountIndex() {
       <h1>My Account</h1>
       {errorMessage && (
         // Error Message
-        <p className={"error-message"}>{errorMessage}</p>
+        <Alert severity="error">{errorMessage}</Alert>
       )}
       {loading && (
         // Loaing Message
@@ -136,96 +146,84 @@ export default function AccountIndex() {
         // Account Data Form
         <>
           <form onSubmit={handleSubmit}>
-            <fieldset>
-              <legend>Account Details</legend>
+            <FormControl fullWidth sx={{}}>
               <div
                 style={{
                   backgroundImage: `url(${previewImage || user.image})`,
                 }}
                 className={"profilePicture"}
               ></div>
-              <br />
-              <p style={{ width: "fit-content" }}>
-                <input
-                  hidden
-                  type="file"
-                  accept="image/*"
-                  ref={imageInputRef}
-                  // value={selectedFile}
-                  onChange={updateImage}
-                />
-                <button
+            </FormControl>
+            <div>
+              <input
+                hidden
+                type="file"
+                accept="image/*"
+                ref={imageInputRef}
+                onChange={updateImage}
+              />
+              <Button
+                variant="contained"
+                type="button"
+                onClick={() => imageInputRef.current.click()}
+              >
+                Update Image
+              </Button>
+              {user.image && (
+                <Button
                   type="button"
-                  style={{ padding: ".5em" }}
-                  onClick={() => imageInputRef.current.click()}
+                  onClick={deleteImage}
+                  sx={{ color: "rgb(219, 72, 72)" }}
                 >
-                  Update Image
-                </button>
-                {user.image && (
-                  <button
-                    type="button"
-                    className={"text-button"}
-                    onClick={deleteImage}
-                  >
-                    Delete
-                  </button>
-                )}
-                {previewImage && (
-                  <button
-                    type="button"
-                    className={"text-button"}
-                    onClick={resetImage}
-                  >
-                    Reset
-                  </button>
-                )}
-              </p>
-              <p>
-                <label htmlFor="name">
-                  <span>Full Name</span>
-                </label>
-                <br />
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={user.name}
-                  onChange={handleChange}
-                />
-              </p>
-              <p>
-                <label htmlFor="email">
-                  <span>Email Address</span>
-                </label>
-                <br />
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={user.email}
-                  onChange={handleChange}
-                />
-              </p>
-              <p>
-                <label htmlFor="phone">
-                  <span>Phone Number</span>
-                </label>
-                <br />
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={user.phone}
-                  onChange={handleChange}
-                />
-              </p>
-            </fieldset>
+                  Delete
+                </Button>
+              )}
+              {previewImage && (
+                <Button type="button" onClick={resetImage}>
+                  Reset
+                </Button>
+              )}
+            </div>
+            <Divider sx={{ my: 3 }} />
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <TextField
+                label="Full Name"
+                type="text"
+                id="name"
+                name="name"
+                value={user.name}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <TextField
+                label="Email"
+                type="email"
+                id="email"
+                name="email"
+                value={user.email}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <TextField
+                label="Phone"
+                type="tel"
+                id="phone"
+                name="phone"
+                value={user.phone}
+                onChange={handleChange}
+              />
+            </FormControl>
+
             <br />
-            <button type="submit">Save</button>
+            <Button variant="contained" type="submit">
+              Save
+            </Button>
             {dataModified && (
-              <button type="button" className={"text-button"} onClick={getUser}>
+              <Button type="button" onClick={getUser}>
                 Cancel
-              </button>
+              </Button>
             )}
           </form>
         </>

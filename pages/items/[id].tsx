@@ -6,6 +6,10 @@ import Link from "next/link"
 import AuctionItem from "../../models/AuctionItem"
 import AuctionEvent from "../../models/AuctionEvent"
 import Bid from "../../models/Bid"
+import { Button, Divider, Typography } from "@mui/material"
+import LaunchIcon from "@mui/icons-material/Launch"
+import { Box } from "@mui/system"
+import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 
 export default function EditItemPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -172,17 +176,29 @@ export default function EditItemPage() {
 
   return (
     <Layout>
-      <p>
-        <a href={`/auctions/${auctionEvent?._id}`}>{"<- "}Back to Auction</a>
-      </p>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1 style={{ display: "inline-block" }}>Edit Item</h1>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{ my: 2, display: "inline-block" }}
+        >
+          Edit Item
+        </Typography>
         {auctionItem?.published && auctionItem?.lotNumber && (
           <Link href={`/${auctionEvent?.slug}/${auctionItem?.lotNumber}`}>
-            <a style={{ margin: "auto 0" }}>View Public Page</a>
+            <Button variant="text" endIcon={<LaunchIcon />}>
+              View Public Page
+            </Button>
           </Link>
         )}
-      </div>
+      </Box>
+      <Divider />
+      <Link href={`/auctions/${auctionEvent?._id}`}>
+        <Button variant="text" startIcon={<ArrowBackIcon />}>
+          Back to Auction
+        </Button>
+      </Link>
+
       {/* // Error Message */}
       {errorMessage && <p className={"error-message"}>{errorMessage}</p>}
       {/* // Loaing Message */}

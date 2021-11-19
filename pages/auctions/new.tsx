@@ -2,6 +2,7 @@ import Layout from "../../components/layout"
 import React, { useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import axios from "axios"
+import { Divider, Typography } from "@mui/material"
 
 export default function NewAuctionPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -76,7 +77,10 @@ export default function NewAuctionPage() {
 
   return (
     <Layout>
-      <h1>New Acution</h1>
+      <Typography variant="h4" component="h1" sx={{ my: 2 }}>
+        New Acution
+      </Typography>
+      <Divider />
 
       {errorMessage && (
         // Error Message

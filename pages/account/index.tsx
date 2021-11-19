@@ -12,6 +12,7 @@ import {
   FormControl,
   InputLabel,
   TextField,
+  Typography,
 } from "@mui/material"
 
 export default function AccountIndex() {
@@ -131,11 +132,12 @@ export default function AccountIndex() {
 
   return (
     <Layout>
-      <h1>My Account</h1>
-      {errorMessage && (
-        // Error Message
-        <Alert severity="error">{errorMessage}</Alert>
-      )}
+      <Typography variant="h4" component="h1" sx={{ my: 2 }}>
+        My Account
+      </Typography>
+      <Divider />
+      {/* // Error Message */}
+      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
       {loading && (
         // Loaing Message
         <>

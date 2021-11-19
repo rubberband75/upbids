@@ -5,6 +5,8 @@ import axios from "axios"
 import Link from "next/link"
 import AuctionItem from "../../models/AuctionItem"
 import AuctionEvent from "../../models/AuctionEvent"
+import { Button, Divider, Typography } from "@mui/material"
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export default function EditItemPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -110,10 +112,15 @@ export default function EditItemPage() {
 
   return (
     <Layout>
-      <p>
-        <a href={`/auctions/${eventId}`}>Back to Auction</a>
-      </p>
-      <h1>New Item</h1>
+      <Typography variant="h4" component="h1" sx={{ my: 2 }}>
+        New Item
+      </Typography>
+      <Divider />
+      <Link href={`/auctions/${eventId}`}>
+        <Button variant="text" startIcon={<ArrowBackIcon />}>
+          Back to Auction
+        </Button>
+      </Link>
       {/* // Error Message */}
       {errorMessage && <p className={"error-message"}>{errorMessage}</p>}
       {/* // Loaing Message */}

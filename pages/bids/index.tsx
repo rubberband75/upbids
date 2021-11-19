@@ -2,6 +2,7 @@ import Layout from "../../components/layout"
 import React, { useEffect, useState, useRef } from "react"
 import Bid from "../../models/Bid"
 import axios from "axios"
+import { Divider, Typography } from "@mui/material"
 
 export default function MyBidsPage() {
   let [loading, setLoading] = useState(true)
@@ -38,7 +39,10 @@ export default function MyBidsPage() {
 
   return (
     <Layout>
-      <h1>My Bids</h1>
+      <Typography variant="h4" component="h1" sx={{ my: 2 }}>
+        My Bids
+      </Typography>
+      <Divider />
 
       <h2>Active Bids</h2>
       <hr />

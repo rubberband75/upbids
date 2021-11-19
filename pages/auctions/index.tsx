@@ -2,6 +2,7 @@ import Layout from "../../components/layout"
 import React, { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import Link from "next/link"
+import { Divider, Typography } from "@mui/material"
 
 export default function MyAuctions() {
   let [loading, setLoading] = useState(true)
@@ -27,7 +28,10 @@ export default function MyAuctions() {
 
   return (
     <Layout>
-      <h1>My Auctions</h1>
+      <Typography variant="h4" component="h1" sx={{ my: 2 }}>
+        My Auctions
+      </Typography>
+      <Divider />
       {/* // Error Message */}
       {errorMessage && <p className={"error-message"}>{errorMessage}</p>}
       {/* // Loaing Message */}

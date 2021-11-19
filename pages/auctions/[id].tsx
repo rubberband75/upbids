@@ -5,6 +5,9 @@ import axios from "axios"
 import Link from "next/link"
 import AuctionItem from "../../models/AuctionItem"
 import Card from "@mui/material/Card"
+import { Button, Divider, Typography } from "@mui/material"
+import LaunchIcon from "@mui/icons-material/Launch"
+import { Box } from "@mui/system"
 
 export default function EditAuctionPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -160,14 +163,23 @@ export default function EditAuctionPage() {
 
   return (
     <Layout>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1 style={{ display: "inline-block" }}>Edit Auction</h1>
-        {event.published && (
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{ my: 2, display: "inline-block" }}
+        >
+          Edit Auction
+        </Typography>
+        {event.published && event.slug && (
           <Link href={`/${event.slug}`}>
-            <a style={{ margin: "auto 0" }}>View Public Page</a>
+            <Button variant="text" endIcon={<LaunchIcon />}>
+              View Public Page
+            </Button>
           </Link>
         )}
-      </div>
+      </Box>
+      <Divider />
       {errorMessage && (
         // Error Message
         <p className={"error-message"}>{errorMessage}</p>

@@ -19,8 +19,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material"
-import LaunchIcon from "@mui/icons-material/Launch"
 import { Box } from "@mui/system"
+import LaunchIcon from "@mui/icons-material/Launch"
 import AuctionItemCard from "../../components/AuctionItemCard"
 
 export default function EditAuctionPage() {
@@ -287,7 +287,7 @@ export default function EditAuctionPage() {
                         </InputAdornment>
                       ),
                     }}
-                    placeholder="event-name"
+                    placeholder="example"
                   />
                 </FormControl>
 
@@ -330,11 +330,7 @@ export default function EditAuctionPage() {
                   Save
                 </Button>
                 {dataModified && (
-                  <Button
-                    type="button"
-                    className={"text-button"}
-                    onClick={getEvent}
-                  >
+                  <Button type="button" onClick={getEvent}>
                     Cancel
                   </Button>
                 )}
@@ -357,7 +353,6 @@ export default function EditAuctionPage() {
               </a>
             </Link>
           ))}
-          <br />
           <Link href={`/items/new?eventId=${id}`}>
             <Button variant="contained" size="large">
               + Add Item

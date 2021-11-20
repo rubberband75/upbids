@@ -1,8 +1,18 @@
 import Layout from "../../components/layout"
-import React, { useEffect, useState, useRef } from "react"
+import React, { useState, useRef } from "react"
 import Link from "next/link"
 import axios from "axios"
-import { Divider, Typography } from "@mui/material"
+import Card from "@mui/material/Card"
+import {
+  Button,
+  CardActions,
+  CardContent,
+  Divider,
+  FormControl,
+  InputAdornment,
+  TextField,
+  Typography,
+} from "@mui/material"
 
 export default function NewAuctionPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -50,7 +60,7 @@ export default function NewAuctionPage() {
   }
 
   const handleChange = (
-    e: React.FormEvent<HTMLInputElement> | React.FormEvent<HTMLTextAreaElement>
+    e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void => {
     setEvent({ ...event, [e.currentTarget.name]: e.currentTarget.value })
   }
@@ -88,96 +98,91 @@ export default function NewAuctionPage() {
       )}
 
       <form onSubmit={handleSubmit}>
-        <fieldset>
-          <legend>Account Details</legend>
+        <Card>
           <div
             style={{
               backgroundImage: `url(${previewImage})`,
             }}
             className={"bannerImage"}
           ></div>
-          <br />
-          <p>
-            <input
-              hidden
-              type="file"
-              accept="image/*"
-              ref={imageInputRef}
-              // value={selectedFile}
-              onChange={updateImage}
-            />
-            <button
-              type="button"
-              style={{ padding: ".5em" }}
-              onClick={() => imageInputRef.current.click()}
-            >
-              Add Banner Image
-            </button>
-            {previewImage && (
-              <button
+          <CardContent>
+            <p>
+              <input
+                hidden
+                type="file"
+                accept="image/*"
+                ref={imageInputRef}
+                onChange={updateImage}
+              />
+              <Button
+                variant="contained"
                 type="button"
-                className={"text-button"}
-                onClick={deleteImage}
+                size="small"
+                onClick={() => imageInputRef.current.click()}
               >
-                Delete
-              </button>
-            )}
-          </p>
-          <p>
-            <label htmlFor="title">
-              <span>Title</span>
-            </label>
-            <br />
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={event.title}
-              onChange={handleChange}
-            />
-          </p>
-          <p>
-            <label htmlFor="description">
-              <span>Description</span>
-            </label>
-            <br />
-
-            <textarea
-              id="description"
-              name="description"
-              rows={5}
-              value={event.description}
-              onChange={handleChange}
-              placeholder="Auction Description..."
-            ></textarea>
-          </p>
-          <p>
-            <label htmlFor="slug">
-              <span>Event URL</span>
-              <br />
-              <i>
-                Where guests can find this event. Example: www.upbids.net/
-                <ins>event-url</ins>
-              </i>
-            </label>
-            <br />
-            <input
-              type="text"
-              id="slug"
-              name="slug"
-              value={event.slug}
-              onChange={handleChange}
-            />
-          </p>
-        </fieldset>
-        <br />
-        <button type="submit">Save</button>
-
-        <Link href="/auctions">
-          <button type="button" className={"text-button"}>
-            Cancel
-          </button>
-        </Link>
+                Update Image
+              </Button>
+              {previewImage && (
+                <Button
+                  type="button"
+                  size="small"
+                  onClick={deleteImage}
+                  sx={{ color: "rgb(219, 72, 72)" }}
+                >
+                  Delete
+                </Button>
+              )}
+            </p>
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <TextField
+                label="Title"
+                type="text"
+                id="title"
+                name="title"
+                value={event.title}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <TextField
+                label="Description"
+                multiline
+                id="description"
+                name="description"
+                rows={5}
+                value={event.description}
+                onChange={handleChange}
+                placeholder="Auction Description..."
+              />
+            </FormControl>
+            <FormControl fullWidth sx={{ my: 2 }}>
+              <TextField
+                label="Event URL"
+                type="text"
+                id="slug"
+                name="slug"
+                value={event.slug}
+                onChange={handleChange}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <i>www.upbids.net/</i>
+                    </InputAdornment>
+                  ),
+                }}
+                placeholder="example"
+              />
+            </FormControl>
+          </CardContent>
+          <CardActions>
+            <Button variant="contained" type="submit">
+              Save
+            </Button>
+            <Link href="/auctions">
+              <Button type="button">Cancel</Button>
+            </Link>
+          </CardActions>
+        </Card>
       </form>
     </Layout>
   )

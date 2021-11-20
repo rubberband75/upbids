@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { signIn, useSession } from "next-auth/react"
 import DefaultErrorPage from "next/error"
 import {
+  Alert,
   Button,
   Card,
   CardActions,
@@ -42,7 +43,9 @@ export default function LotNumberPage() {
   let [errorMessage, setErrorMessage] = useState("")
   let [auctionItem, setAuctionItem] = useState<AuctionItem>(new AuctionItem())
   let [currentBid, setCurrentBid] = useState<Bid>()
+  let [minNextBid, setMinNextBid] = useState(0)
   let [bidAmount, setBidAmount] = useState(0)
+  let [verifyingBid, setVerifyingBid] = useState(false)
 
   let [user, setUser] = useState({
     name: "",
@@ -51,29 +54,33 @@ export default function LotNumberPage() {
   })
 
   const getItem = () => {
-    setLoading(true)
     setErrorMessage("")
-    setNotFound(false)
     axios
       .get(`/api/auctions/public/${slug}/${lotNumber}`)
       .then((response) => {
-        setAuctionItem(response.data.auctionItem)
-        setCurrentBid(response.data.currentBid)
+        let item = response.data.auctionItem
+        let bid = response.data.currentBid
 
-        setBidAmount(
-          !currentBid
-            ? auctionItem?.startingBid || 0
-            : currentBid.amount + (auctionItem?.minimunIncrement || 0)
-        )
-        console.log({ bidAmount })
+        setAuctionItem(item)
+        setCurrentBid(bid)
+
+        let minBid = bid ? bid.amount + item.minimunIncrement : item.startingBid
+
+        setMinNextBid(minBid)
+        setBidAmount(Math.max(minBid, bidAmount))
       })
       .catch((error: any) => {
         console.error({ error })
         if (error.response?.status === 404) setNotFound(true)
-        setErrorMessage(`${error.response.data.error}`)
+        try {
+          setErrorMessage(`Error: ${error.response.data.error}`)
+        } catch (e) {
+          setErrorMessage(`${error}`)
+        }
       })
       .finally(() => {
         setLoading(false)
+        setVerifyingBid(false)
       })
   }
 
@@ -83,10 +90,6 @@ export default function LotNumberPage() {
     setUser({ ...user, [e.currentTarget.name]: e.currentTarget.value })
   }
 
-  const minNextBid = !currentBid
-    ? auctionItem?.startingBid || 0
-    : currentBid.amount + (auctionItem?.minimunIncrement || 0)
-
   const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -95,19 +98,31 @@ export default function LotNumberPage() {
   })
 
   const placeBid = async () => {
+    setErrorMessage("")
+    setVerifyingBid(true)
     try {
       await axios.post("/api/bids/place-bid", {
         itemId: auctionItem?._id,
         amount: bidAmount,
       })
-      window.location.reload()
-    } catch (error) {
+      // window.location.reload()
+      getItem()
+    } catch (error: any) {
       console.error(error)
+      try {
+        setErrorMessage(`Error: ${error.response.data.error}`)
+      } catch (e) {
+        setErrorMessage(`${error}`)
+      }
+    } finally {
+      setVerifyingBid(false)
     }
   }
 
   const placeGuestBid = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setErrorMessage("")
+    setVerifyingBid(true)
     try {
       await axios.post("/api/bids/place-bid", {
         itemId: auctionItem?._id,
@@ -116,9 +131,17 @@ export default function LotNumberPage() {
         email: user.email,
         phone: user.phone,
       })
-      window.location.reload()
-    } catch (error) {
+      // window.location.reload()
+      getItem()
+    } catch (error: any) {
       console.error(error)
+      try {
+        setErrorMessage(`Error: ${error.response.data.error}`)
+      } catch (e) {
+        setErrorMessage(`${error}`)
+      }
+    } finally {
+      setVerifyingBid(false)
     }
   }
 
@@ -163,9 +186,7 @@ export default function LotNumberPage() {
             </Grid>
           </Grid>
 
-          <br />
-          <Divider />
-          <br />
+          <Divider sx={{ my: 3 }} />
 
           <Paper elevation={0} sx={{ textAlign: "center" }}>
             <Typography variant="h4" gutterBottom component="div">
@@ -197,9 +218,6 @@ export default function LotNumberPage() {
                     onChange={(e) => {
                       setBidAmount(Number(e.currentTarget.value))
                     }}
-                    // step="0.01"
-                    // placeholder="0.00"
-                    // min={minNextBid.toFixed(2)}
                     startAdornment={
                       <InputAdornment position="start">$</InputAdornment>
                     }
@@ -207,7 +225,12 @@ export default function LotNumberPage() {
                 </FormControl>
                 {session && (
                   <FormControl fullWidth>
-                    <Button variant="contained" size="large" onClick={placeBid}>
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={placeBid}
+                      disabled={bidAmount < minNextBid || verifyingBid}
+                    >
                       Place Bid
                     </Button>
                   </FormControl>
@@ -279,7 +302,11 @@ export default function LotNumberPage() {
                               size="large"
                               type="submit"
                               disabled={
-                                !user.name || !user.email || !user.phone
+                                !user.name ||
+                                !user.email ||
+                                !user.phone ||
+                                bidAmount < minNextBid ||
+                                verifyingBid
                               }
                             >
                               Place Bid
@@ -290,6 +317,9 @@ export default function LotNumberPage() {
                     </form>
                   </>
                 )}
+
+                {/* // Error Message */}
+                {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
               </>
             )}
           </Paper>

@@ -6,10 +6,30 @@ import Link from "next/link"
 import AuctionItem from "../../models/AuctionItem"
 import AuctionEvent from "../../models/AuctionEvent"
 import Bid from "../../models/Bid"
-import { Button, Divider, Typography } from "@mui/material"
 import LaunchIcon from "@mui/icons-material/Launch"
 import { Box } from "@mui/system"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
+import Card from "@mui/material/Card"
+import {
+  Button,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Checkbox,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  IconButton,
+  InputAdornment,
+  Skeleton,
+  Switch,
+  TextField,
+  Typography,
+} from "@mui/material"
+import DownloadIcon from "@mui/icons-material/Download"
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
+import DeleteIcon from "@mui/icons-material/Delete"
 
 export default function EditItemPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -29,7 +49,7 @@ export default function EditItemPage() {
   const [QRHash, setQRHash] = useState(0)
 
   const getAuctionItem = async () => {
-    setLoading(true)
+    // setLoading(true)
     setErrorMessage("")
     try {
       let response = await axios.get(`/api/items/${id}`)
@@ -54,10 +74,14 @@ export default function EditItemPage() {
     }
   }
 
-  const togglePaid = async (bidId: string, currentStatus: Boolean) => {
+  const togglePaid = async (
+    index: number,
+    bidId: string,
+    currentStatus: Boolean
+  ) => {
     if (bids && bids.length) {
       let upadatedBids = [...bids]
-      upadatedBids[0].paid = !currentStatus
+      upadatedBids[index].paid = !currentStatus
       setBids(upadatedBids)
     }
 
@@ -120,7 +144,7 @@ export default function EditItemPage() {
   }
 
   const handleChange = (
-    e: React.FormEvent<HTMLInputElement> | React.FormEvent<HTMLTextAreaElement>
+    e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void => {
     let item: any = { ...auctionItem }
     item[e.currentTarget.name] = e.currentTarget.value
@@ -207,176 +231,175 @@ export default function EditItemPage() {
       {!loading && (
         <>
           <form onSubmit={handleSubmit}>
-            <fieldset>
-              <legend>Item Details</legend>
-              <div
-                style={{
-                  backgroundImage: `url(${previewImage || auctionItem?.image})`,
-                }}
-                className={"profilePicture"}
-              ></div>
-              <br />
-              <p style={{ width: "fit-content" }}>
-                <input
-                  hidden
-                  type="file"
-                  accept="image/*"
-                  ref={imageInputRef}
-                  // value={selectedFile}
-                  onChange={updateImage}
-                />
-                <button
-                  type="button"
-                  style={{ padding: ".5em" }}
-                  onClick={() => imageInputRef.current.click()}
+            <Card>
+              <CardContent>
+                {previewImage || auctionItem?.image ? (
+                  <CardMedia
+                    component="img"
+                    image={previewImage || auctionItem?.image}
+                    sx={{
+                      width: "250px",
+                      height: "250px",
+                      borderRadius: "1em",
+                    }}
+                  />
+                ) : (
+                  <Skeleton
+                    variant="rectangular"
+                    width={250}
+                    height={250}
+                    animation={false}
+                    sx={{
+                      borderRadius: "1em",
+                    }}
+                  />
+                )}
+
+                <Box sx={{ my: 2 }}>
+                  <input
+                    hidden
+                    type="file"
+                    accept="image/*"
+                    ref={imageInputRef}
+                    onChange={updateImage}
+                  />
+                  <Button
+                    variant="contained"
+                    type="button"
+                    size="small"
+                    onClick={() => imageInputRef.current.click()}
+                  >
+                    Update Image
+                  </Button>
+                  {auctionItem?.image && (
+                    <Button
+                      type="button"
+                      size="small"
+                      onClick={deleteImage}
+                      sx={{ color: "rgb(219, 72, 72)" }}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                  {previewImage && (
+                    <Button type="button" size="small" onClick={resetImage}>
+                      Reset
+                    </Button>
+                  )}
+                </Box>
+
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Title"
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={auctionItem?.title}
+                    onChange={handleChange}
+                  />
+                </FormControl>
+
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Description"
+                    multiline
+                    id="description"
+                    name="description"
+                    rows={5}
+                    value={auctionItem?.description}
+                    onChange={handleChange}
+                    placeholder="Auction Description..."
+                  />
+                </FormControl>
+
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Lot Number"
+                    type="number"
+                    id="lotNumber"
+                    name="lotNumber"
+                    // min="1"
+                    // step="1"
+                    value={auctionItem?.lotNumber}
+                    onChange={handleChange}
+                  />
+                </FormControl>
+
+                <Divider />
+
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Retail Value"
+                    type="number"
+                    id="retailValue"
+                    name="retailValue"
+                    // min="1"
+                    // step="1"
+                    value={auctionItem?.retailValue}
+                    onChange={handleChange}
+                  />
+                </FormControl>
+
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Starting Bid"
+                    type="number"
+                    id="startingBid"
+                    name="startingBid"
+                    // min="1"
+                    // step="1"
+                    value={auctionItem?.startingBid}
+                    onChange={handleChange}
+                  />
+                </FormControl>
+
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Minimun Increment"
+                    type="number"
+                    id="minimunIncrement"
+                    name="minimunIncrement"
+                    // min="1"
+                    // step="1"
+                    value={auctionItem?.minimunIncrement}
+                    onChange={handleChange}
+                  />
+                </FormControl>
+
+                <Divider />
+
+                <FormGroup>
+                  <FormControlLabel
+                    label="Published"
+                    control={
+                      <Switch
+                        checked={!!auctionItem?.published}
+                        onChange={(e) => {
+                          let item: any = { ...auctionItem }
+                          item.published = !auctionItem?.published
+                          setAuctionItem(item)
+                          setDataModified(true)
+                        }}
+                      />
+                    }
+                  />
+                </FormGroup>
+              </CardContent>
+              <CardActions>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  disabled={!dataModified}
                 >
-                  Update Image
-                </button>
-                {auctionItem?.image && (
-                  <button
-                    type="button"
-                    className={"text-button"}
-                    onClick={deleteImage}
-                  >
-                    Delete
-                  </button>
+                  Save
+                </Button>
+                {dataModified && (
+                  <Button type="button" onClick={getAuctionItem}>
+                    Cancel
+                  </Button>
                 )}
-                {previewImage && (
-                  <button
-                    type="button"
-                    className={"text-button"}
-                    onClick={resetImage}
-                  >
-                    Reset
-                  </button>
-                )}
-              </p>
-
-              <p>
-                <label htmlFor="title">
-                  <span>Title</span>
-                </label>
-                <br />
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={auctionItem?.title}
-                  onChange={handleChange}
-                />
-              </p>
-
-              <p>
-                <label htmlFor="description">
-                  <span>Description</span>
-                </label>
-                <br />
-
-                <textarea
-                  id="description"
-                  name="description"
-                  rows={5}
-                  value={auctionItem?.description}
-                  onChange={handleChange}
-                  placeholder="Auction Description..."
-                ></textarea>
-              </p>
-
-              <p>
-                <label htmlFor="lotNumber">
-                  <span>Lot Number</span>
-                </label>
-                <br />
-                <input
-                  id="lotNumber"
-                  name="lotNumber"
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={auctionItem?.lotNumber}
-                  onChange={handleChange}
-                />
-              </p>
-
-              <hr />
-
-              <p>
-                <label htmlFor="retailValue">
-                  <span>Retail Value</span>
-                </label>
-                <br />
-                <input
-                  id="retailValue"
-                  name="retailValue"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={auctionItem?.retailValue}
-                  onChange={handleChange}
-                />
-              </p>
-
-              <p>
-                <label htmlFor="startingBid">
-                  <span>Starting Bid</span>
-                </label>
-                <br />
-                <input
-                  id="startingBid"
-                  name="startingBid"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={auctionItem?.startingBid}
-                  onChange={handleChange}
-                />
-              </p>
-
-              <p>
-                <label htmlFor="minimunIncrement">
-                  <span>Minimun Increment</span>
-                </label>
-                <br />
-                <input
-                  id="minimunIncrement"
-                  name="minimunIncrement"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={auctionItem?.minimunIncrement}
-                  onChange={handleChange}
-                />
-              </p>
-
-              <hr />
-
-              <p>
-                <input
-                  type="checkbox"
-                  id="published"
-                  name="published"
-                  checked={!!auctionItem?.published}
-                  onChange={(e) => {
-                    let item: any = { ...auctionItem }
-                    item.published = !auctionItem?.published
-                    setAuctionItem(item)
-                    setDataModified(true)
-                  }}
-                />
-                <label htmlFor="published">Published</label>
-              </p>
-            </fieldset>
-            <br />
-            <button type="submit">Save</button>
-            {dataModified && (
-              <button
-                type="button"
-                className={"text-button"}
-                onClick={getAuctionItem}
-              >
-                Cancel
-              </button>
-            )}
+              </CardActions>
+            </Card>
           </form>
         </>
       )}
@@ -390,13 +413,14 @@ export default function EditItemPage() {
           <a
             href={`/api/items/${auctionItem?._id}/qr?${QRHash}`}
             download={`Lot-${auctionItem?.lotNumber}-QR.png`}
+            style={{ textDecoration: "none" }}
           >
             <img
               src={`/api/items/${auctionItem?._id}/qr?${QRHash}`}
               width="50%"
             />
             <br />
-            Download
+            <Button startIcon={<DownloadIcon />}>Download</Button>
           </a>
         </p>
       )}
@@ -417,7 +441,10 @@ export default function EditItemPage() {
         </thead>
         <tbody>
           {bids.map(
-            ({ _id, timestamp, amount, won, isTopBid, paid, userId }) => {
+            (
+              { _id, timestamp, amount, won, isTopBid, paid, userId },
+              index
+            ) => {
               if (typeof userId === "object") {
                 return (
                   <tr key={_id}>
@@ -433,13 +460,16 @@ export default function EditItemPage() {
                     <td>{currencyFormatter.format(amount)}</td>
                     <td>
                       {_id && (
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           name={_id}
-                          disabled={!!!isTopBid}
+                          // disabled={!!!isTopBid}
                           checked={!!paid}
                           onChange={async (e) => {
-                            await togglePaid(e.currentTarget.name, !!paid)
+                            await togglePaid(
+                              index,
+                              e.currentTarget.name,
+                              !!paid
+                            )
                             loadBids()
                           }}
                         />
@@ -447,17 +477,22 @@ export default function EditItemPage() {
                     </td>
                     <td>
                       {_id && (
-                        <button
+                        <IconButton
                           type="button"
                           name={_id}
-                          className={"text-button"}
                           onClick={async (e) => {
-                            await removeBid(e.currentTarget.name)
+                            if (
+                              confirm(
+                                "Are you sure you want to delete this Bid?"
+                              )
+                            ) {
+                              await removeBid(e.currentTarget.name)
+                            }
                             loadBids()
                           }}
                         >
-                          Remove
-                        </button>
+                          <DeleteForeverIcon />
+                        </IconButton>
                       )}
                     </td>
                   </tr>
@@ -472,9 +507,11 @@ export default function EditItemPage() {
       <br />
       <h2>Danger Zone</h2>
       <hr />
-      <button
+      <Button
         type="button"
-        style={{ backgroundColor: "#c11b1b" }}
+        // style={{ backgroundColor: "#c11b1b" }}
+        color="error"
+        variant="contained"
         onClick={() => {
           if (confirm("Are you sure you want to delete this Item?")) {
             deleteItem()
@@ -482,7 +519,7 @@ export default function EditItemPage() {
         }}
       >
         Delete Auction
-      </button>
+      </Button>
     </Layout>
   )
 }

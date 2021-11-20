@@ -38,6 +38,14 @@ export default function LotNumberPage() {
     getItem()
   }, [router.isReady])
 
+  useEffect(() => {
+    if (!router.isReady) return
+    const interval = setInterval(() => {
+      getItem()
+    }, 10000)
+    return () => clearInterval(interval)
+  }, [router.isReady])
+
   let [loading, setLoading] = useState(true)
   let [notFound, setNotFound] = useState(false)
   let [errorMessage, setErrorMessage] = useState("")

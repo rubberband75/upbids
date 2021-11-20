@@ -4,9 +4,23 @@ import React, { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import Link from "next/link"
 import AuctionItem from "../../models/AuctionItem"
-import AuctionEvent from "../../models/AuctionEvent"
-import { Button, Divider, Typography } from "@mui/material"
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack"
+import Card from "@mui/material/Card"
+import {
+  Button,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  Skeleton,
+  Switch,
+  TextField,
+  Typography,
+} from "@mui/material"
+import { Box } from "@mui/system"
 
 export default function EditItemPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -77,7 +91,7 @@ export default function EditItemPage() {
   }
 
   const handleChange = (
-    e: React.FormEvent<HTMLInputElement> | React.FormEvent<HTMLTextAreaElement>
+    e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void => {
     let item: any = { ...auctionItem }
     item[e.currentTarget.name] = e.currentTarget.value
@@ -129,171 +143,169 @@ export default function EditItemPage() {
       {!loading && (
         <>
           <form onSubmit={handleSubmit}>
-            <fieldset>
-              <legend>Item Details</legend>
-              <div
-                style={{
-                  backgroundImage: `url(${previewImage || auctionItem?.image})`,
-                }}
-                className={"profilePicture"}
-              ></div>
-              <br />
-              <p style={{ width: "fit-content" }}>
-                <input
-                  hidden
-                  type="file"
-                  accept="image/*"
-                  ref={imageInputRef}
-                  // value={selectedFile}
-                  onChange={updateImage}
-                />
-                <button
-                  type="button"
-                  style={{ padding: ".5em" }}
-                  onClick={() => imageInputRef.current.click()}
-                >
-                  Update Image
-                </button>
-                {auctionItem?.image && (
-                  <button
-                    type="button"
-                    className={"text-button"}
-                    onClick={deleteImage}
-                  >
-                    Delete
-                  </button>
+            <Card>
+              <CardContent>
+                {previewImage || auctionItem?.image ? (
+                  <CardMedia
+                    component="img"
+                    image={previewImage || auctionItem?.image}
+                    sx={{
+                      width: "250px",
+                      height: "250px",
+                      borderRadius: "5px",
+                    }}
+                  />
+                ) : (
+                  <Skeleton
+                    variant="rectangular"
+                    width={250}
+                    height={250}
+                    animation={false}
+                    sx={{
+                      borderRadius: "5px",
+                    }}
+                  />
                 )}
-                {previewImage && (
-                  <button
+                <Box sx={{ my: 2 }}>
+                  <input
+                    hidden
+                    type="file"
+                    accept="image/*"
+                    ref={imageInputRef}
+                    onChange={updateImage}
+                  />
+                  <Button
+                    variant="contained"
                     type="button"
-                    className={"text-button"}
-                    onClick={resetImage}
+                    size="small"
+                    onClick={() => imageInputRef.current.click()}
                   >
-                    Reset
-                  </button>
-                )}
-              </p>
+                    Update Image
+                  </Button>
+                  {auctionItem?.image && (
+                    <Button
+                      type="button"
+                      size="small"
+                      onClick={deleteImage}
+                      sx={{ color: "rgb(219, 72, 72)" }}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                  {previewImage && (
+                    <Button type="button" size="small" onClick={resetImage}>
+                      Reset
+                    </Button>
+                  )}
+                </Box>
 
-              <p>
-                <label htmlFor="title">
-                  <span>Title</span>
-                </label>
-                <br />
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={auctionItem?.title}
-                  onChange={handleChange}
-                />
-              </p>
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Title"
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={auctionItem?.title}
+                    onChange={handleChange}
+                  />
+                </FormControl>
 
-              <p>
-                <label htmlFor="description">
-                  <span>Description</span>
-                </label>
-                <br />
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Description"
+                    multiline
+                    id="description"
+                    name="description"
+                    rows={5}
+                    value={auctionItem?.description}
+                    onChange={handleChange}
+                    placeholder="Auction Description..."
+                  />
+                </FormControl>
 
-                <textarea
-                  id="description"
-                  name="description"
-                  rows={5}
-                  value={auctionItem?.description}
-                  onChange={handleChange}
-                  placeholder="Auction Description..."
-                ></textarea>
-              </p>
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Lot Number"
+                    type="number"
+                    id="lotNumber"
+                    name="lotNumber"
+                    // min="1"
+                    // step="1"
+                    value={auctionItem?.lotNumber}
+                    onChange={handleChange}
+                  />
+                </FormControl>
 
-              <p>
-                <label htmlFor="lotNumber">
-                  <span>Lot Number</span>
-                </label>
-                <br />
-                <input
-                  id="lotNumber"
-                  name="lotNumber"
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={auctionItem?.lotNumber}
-                  onChange={handleChange}
-                />
-              </p>
+                <Divider />
 
-              <hr />
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Retail Value"
+                    type="number"
+                    id="retailValue"
+                    name="retailValue"
+                    // min="1"
+                    // step="1"
+                    value={auctionItem?.retailValue}
+                    onChange={handleChange}
+                  />
+                </FormControl>
 
-              <p>
-                <label htmlFor="retailValue">
-                  <span>Retail Value</span>
-                </label>
-                <br />
-                <input
-                  id="retailValue"
-                  name="retailValue"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={auctionItem?.retailValue}
-                  onChange={handleChange}
-                />
-              </p>
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Starting Bid"
+                    type="number"
+                    id="startingBid"
+                    name="startingBid"
+                    // min="1"
+                    // step="1"
+                    value={auctionItem?.startingBid}
+                    onChange={handleChange}
+                  />
+                </FormControl>
 
-              <p>
-                <label htmlFor="startingBid">
-                  <span>Starting Bid</span>
-                </label>
-                <br />
-                <input
-                  id="startingBid"
-                  name="startingBid"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={auctionItem?.startingBid}
-                  onChange={handleChange}
-                />
-              </p>
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Minimun Increment"
+                    type="number"
+                    id="minimunIncrement"
+                    name="minimunIncrement"
+                    // min="1"
+                    // step="1"
+                    value={auctionItem?.minimunIncrement}
+                    onChange={handleChange}
+                  />
+                </FormControl>
 
-              <p>
-                <label htmlFor="minimunIncrement">
-                  <span>Minimun Increment</span>
-                </label>
-                <br />
-                <input
-                  id="minimunIncrement"
-                  name="minimunIncrement"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={auctionItem?.minimunIncrement}
-                  onChange={handleChange}
-                />
-              </p>
+                <Divider />
 
-              <hr />
-
-              <p>
-                <input
-                  type="checkbox"
-                  id="published"
-                  name="published"
-                  checked={!!auctionItem?.published}
-                  onChange={(e) => {
-                    let item: any = { ...auctionItem }
-                    item.published = !auctionItem?.published
-                    setAuctionItem(item)
-                  }}
-                />
-                <label htmlFor="published">Published</label>
-              </p>
-            </fieldset>
-            <br />
-            <button type="submit">Save</button>
-            <a href={`/auctions/${eventId}`}>
-              <button type="button" className={"text-button"}>
-                Cancel
-              </button>
-            </a>
+                <FormGroup>
+                  <FormControlLabel
+                    label="Published"
+                    control={
+                      <Switch
+                        checked={!!auctionItem?.published}
+                        onChange={(e) => {
+                          let item: any = { ...auctionItem }
+                          item.published = !auctionItem?.published
+                          setAuctionItem(item)
+                        }}
+                      />
+                    }
+                  />
+                </FormGroup>
+              </CardContent>
+              <CardActions>
+                <Button type="submit" variant="contained">
+                  Save
+                </Button>
+                <Link href={`/auctions/${eventId}`}>
+                  <a style={{ textDecoration: "none" }}>
+                    <Button type="button">Cancel</Button>
+                  </a>
+                </Link>
+              </CardActions>
+            </Card>
           </form>
         </>
       )}

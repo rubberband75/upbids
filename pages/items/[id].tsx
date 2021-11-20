@@ -21,7 +21,6 @@ import {
   FormControlLabel,
   FormGroup,
   IconButton,
-  InputAdornment,
   Skeleton,
   Switch,
   TextField,
@@ -29,7 +28,6 @@ import {
 } from "@mui/material"
 import DownloadIcon from "@mui/icons-material/Download"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
-import DeleteIcon from "@mui/icons-material/Delete"
 
 export default function EditItemPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -240,7 +238,7 @@ export default function EditItemPage() {
                     sx={{
                       width: "250px",
                       height: "250px",
-                      borderRadius: "1em",
+                      borderRadius: "5px",
                     }}
                   />
                 ) : (
@@ -250,7 +248,7 @@ export default function EditItemPage() {
                     height={250}
                     animation={false}
                     sx={{
-                      borderRadius: "1em",
+                      borderRadius: "5px",
                     }}
                   />
                 )}

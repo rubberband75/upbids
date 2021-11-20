@@ -191,28 +191,34 @@ export default function UpBidsAppBar() {
           {session && (
             <>
               <ListItem disablePadding>
-                <ListItemButton component="a" href="/account">
-                  <ListItemIcon>
-                    <PersonIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="My Account" />
-                </ListItemButton>
+                <Link href="/account">
+                  <ListItemButton component="a">
+                    <ListItemIcon>
+                      <PersonIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="My Account" />
+                  </ListItemButton>
+                </Link>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton component="a" href="/auctions">
-                  <ListItemIcon>
-                    <EventIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="My Auctions" />
-                </ListItemButton>
+                <Link href="/auctions">
+                  <ListItemButton component="a">
+                    <ListItemIcon>
+                      <EventIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="My Auctions" />
+                  </ListItemButton>
+                </Link>
               </ListItem>
               <ListItem disablePadding>
-                <ListItemButton component="a" href="/bids">
-                  <ListItemIcon>
-                    <LoyaltyIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="My Bids" />
-                </ListItemButton>
+                <Link href="/bids">
+                  <ListItemButton component="a">
+                    <ListItemIcon>
+                      <LoyaltyIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="My Bids" />
+                  </ListItemButton>
+                </Link>
               </ListItem>
             </>
           )}
@@ -220,12 +226,14 @@ export default function UpBidsAppBar() {
           <Divider />
 
           <ListItem disablePadding>
-            <ListItemButton component="a" href="/discover">
-              <ListItemIcon>
-                <ExploreIcon />
-              </ListItemIcon>
-              <ListItemText primary="Discover" />
-            </ListItemButton>
+            <Link href="/discover">
+              <ListItemButton component="a">
+                <ListItemIcon>
+                  <ExploreIcon />
+                </ListItemIcon>
+                <ListItemText primary="Discover" />
+              </ListItemButton>
+            </Link>
           </ListItem>
         </List>
       </Drawer>

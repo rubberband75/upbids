@@ -1,15 +1,23 @@
 import Layout from "../../components/layout"
-import React, { useEffect, useState, useRef } from "react"
+import React, { useEffect, useState } from "react"
 import axios from "axios"
 import Link from "next/link"
 import {
   Button,
   Card,
   CardActionArea,
+  CardActions,
   CardContent,
+  CardMedia,
+  Chip,
   Divider,
   Typography,
 } from "@mui/material"
+import PublicIcon from "@mui/icons-material/Public"
+import PublicOffIcon from "@mui/icons-material/PublicOff"
+import EventAvailableIcon from "@mui/icons-material/EventAvailable"
+import EventBusyIcon from "@mui/icons-material/EventBusy"
+import AuctionEventCardSkeleton from "../../components/AuctionEventCardSkeleton"
 
 export default function MyAuctions() {
   let [loading, setLoading] = useState(true)
@@ -41,8 +49,8 @@ export default function MyAuctions() {
       <Divider />
       {/* // Error Message */}
       {errorMessage && <p className={"error-message"}>{errorMessage}</p>}
-      {/* // Loaing Message */}
-      {loading && <p>Loading...</p>}
+      {/* // Loaing Skeleton */}
+      {loading && <AuctionEventCardSkeleton bannerHeight={140} />}
       {/* // Account Data Form */}
       {!loading && (
         <>
@@ -52,15 +60,64 @@ export default function MyAuctions() {
             </div>
           )}
 
-          {auctions.map(({ _id, title }) => (
-            <Link href={`/auctions/${_id}`} key={_id}>
-              <Card sx={{ my: 2 }}>
+          {auctions.map((auctionEvent) => (
+            <Link href={`/auctions/${auctionEvent._id}`} key={auctionEvent._id}>
+              <Card sx={{ my: 4 }}>
                 <CardActionArea>
+                  {auctionEvent.bannerImage && (
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={auctionEvent.bannerImage}
+                    />
+                  )}
                   <CardContent>
-                    <Typography variant="h5" component="span" sx={{ my: 2 }}>
-                      {title}
+                    <Typography gutterBottom variant="h5" component="div">
+                      {auctionEvent.title}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      component="div"
+                      sx={{
+                        textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {auctionEvent.description}
                     </Typography>
                   </CardContent>
+                  <CardActions>
+                    <Typography variant="body2">
+                      {auctionEvent.published ? (
+                        <Chip
+                          icon={<PublicIcon />}
+                          label="Published"
+                          variant="outlined"
+                        />
+                      ) : (
+                        <Chip
+                          icon={<PublicOffIcon />}
+                          label="Unpublished"
+                          variant="outlined"
+                        />
+                      )}{" "}
+                      {auctionEvent.biddingOpen ? (
+                        <Chip
+                          icon={<EventAvailableIcon />}
+                          label="Bidding Open"
+                          variant="outlined"
+                        />
+                      ) : (
+                        <Chip
+                          icon={<EventBusyIcon />}
+                          label="Bidding Closed"
+                          variant="outlined"
+                        />
+                      )}
+                    </Typography>
+                  </CardActions>
                 </CardActionArea>
               </Card>
             </Link>

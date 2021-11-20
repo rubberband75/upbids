@@ -17,6 +17,7 @@ import {
   Typography,
 } from "@mui/material"
 import AuctionEvent from "../models/AuctionEvent"
+import AuctionEventCardSkeleton from "../components/AuctionEventCardSkeleton"
 
 export default function MyAuctions() {
   let [loading, setLoading] = useState(true)
@@ -49,26 +50,7 @@ export default function MyAuctions() {
       {/* // Error Message */}
       {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
       {/* // Loaing Message */}
-      {loading && (
-        <Card sx={{ my: 4 }}>
-          <Skeleton
-            sx={{ height: 175 }}
-            animation="wave"
-            variant="rectangular"
-          />
-          <CardContent>
-            <Typography variant="h4" sx={{ mb: 2 }}>
-              <Skeleton />
-            </Typography>
-            <Skeleton
-              animation="wave"
-              height={10}
-              style={{ marginBottom: 6 }}
-            />
-            <Skeleton animation="wave" height={10} width="80%" />
-          </CardContent>
-        </Card>
-      )}
+      {loading && <AuctionEventCardSkeleton />}
       {/* // Account Data Form */}
       {!loading && (
         <>
@@ -86,11 +68,11 @@ export default function MyAuctions() {
                     component="img"
                     height="175"
                     image={auction.bannerImage}
-                    alt="green iguana"
                   />
                   <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
-                      {auction.title}{"\t"}
+                      {auction.title}
+                      {"\t"}
                       {auction.biddingOpen && (
                         <Chip
                           label="Bidding Open"

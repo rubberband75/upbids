@@ -21,6 +21,7 @@ import {
 } from "@mui/material"
 import LaunchIcon from "@mui/icons-material/Launch"
 import { Box } from "@mui/system"
+import AuctionItemCard from "../../components/AuctionItemCard"
 
 export default function EditAuctionPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -349,29 +350,10 @@ export default function EditAuctionPage() {
               <i>You haven't added any auction items</i>
             </div>
           )}
-          {auctionItems.map(({ _id, title, image, lotNumber, retailValue }) => (
-            <Link href={`/items/${_id}`}>
-              <a className={"text-decoration-none"}>
-                <Card variant="outlined">
-                  <div
-                    style={{
-                      backgroundImage: `url(${image})`,
-                      width: "150px",
-                      height: "150px",
-                    }}
-                    className={"bannerImage"}
-                  ></div>
-
-                  <p style={{ margin: "0 2em" }}>
-                    Lot #{lotNumber?.toString().padStart(3, "0")}
-                    <h2>{title}</h2>
-                    <span>
-                      <small>Retail Value</small>
-                      <br />
-                      {currencyFormatter.format(Number(retailValue))}
-                    </span>
-                  </p>
-                </Card>
+          {auctionItems.map((auctionItem: AuctionItem) => (
+            <Link href={`/items/${auctionItem._id}`} key={auctionItem._id}>
+              <a style={{ textDecoration: "none" }}>
+                <AuctionItemCard auctionItem={auctionItem} />
               </a>
             </Link>
           ))}

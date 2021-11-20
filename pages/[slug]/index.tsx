@@ -18,6 +18,7 @@ import {
   Skeleton,
   Typography,
 } from "@mui/material"
+import AuctionItemCard from "../../components/AuctionItemCard"
 
 export default function AuctionPage() {
   const router = useRouter()
@@ -56,13 +57,6 @@ export default function AuctionPage() {
       })
   }
 
-  const currencyFormatter = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
-
   return (
     <Layout>
       {loading && <Skeleton />}
@@ -89,51 +83,19 @@ export default function AuctionPage() {
             Auction Items
           </Typography>
           <Divider />
-          {auctionItems.map(
-            ({ _id, title, image, lotNumber, retailValue, startingBid }) => (
-              <Card variant="outlined" sx={{ my: 3 }} key={_id}>
-                <Link href={`/${slug}/${lotNumber}`}>
-                  <CardActionArea>
-                    <Grid container spacing={0}>
-                      <Grid item xs={4}>
-                        <CardMedia
-                          image={image}
-                          sx={{
-                            backgroundImage: `url(${image})`,
-                            width: "100%",
-                            height: "100%",
-                          }}
-                        />
-                      </Grid>
-
-                      <Grid item xs={8}>
-                        <CardContent>
-                          <Typography variant="overline" component="span">
-                            Lot #{lotNumber?.toString().padStart(3, "0")}
-                          </Typography>
-                          <Typography variant="h5" component="h3">
-                            {title}
-                          </Typography>
-                          <span>
-                            <small>Retail Value</small>
-                            <br />
-                            {currencyFormatter.format(Number(retailValue))}
-                          </span>
-                        </CardContent>
-                      </Grid>
-                    </Grid>
-                  </CardActionArea>
-                </Link>
-                {/* <Divider />
-                <CardActions>
-                  <Typography variant="h5" component="span">
-                    Starting Bid:{" "}
-                    {currencyFormatter.format(Number(startingBid))}
-                  </Typography>
-                </CardActions> */}
-              </Card>
-            )
-          )}
+          {auctionItems.map((auctionItem: AuctionItem) => (
+            <Link
+              href={`/${slug}/${auctionItem.lotNumber}`}
+              key={auctionItem._id}
+            >
+              <a style={{ textDecoration: "none" }}>
+                <AuctionItemCard
+                  auctionItem={auctionItem}
+                  key={auctionItem._id}
+                />
+              </a>
+            </Link>
+          ))}
         </>
       )}
       {(notFound || !auctionEvent) && <DefaultErrorPage statusCode={404} />}

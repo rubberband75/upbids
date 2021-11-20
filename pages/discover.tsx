@@ -19,7 +19,7 @@ import {
 import AuctionEvent from "../models/AuctionEvent"
 import AuctionEventCardSkeleton from "../components/AuctionEventCardSkeleton"
 
-export default function MyAuctions() {
+export default function DiscoverPage() {
   let [loading, setLoading] = useState(true)
   let [errorMessage, setErrorMessage] = useState("")
   let [auctions, setAuctions] = useState<AuctionEvent[]>([])
@@ -61,33 +61,35 @@ export default function MyAuctions() {
           )}
 
           {auctions.map((auction: AuctionEvent) => (
-            <Link href={`/${auction.slug}`}>
-              <Card sx={{ my: 4 }}>
-                <CardActionArea>
-                  <CardMedia
-                    component="img"
-                    height="175"
-                    image={auction.bannerImage}
-                  />
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                      {auction.title}
-                      {"\t"}
-                      {auction.biddingOpen && (
-                        <Chip
-                          label="Bidding Open"
-                          color="primary"
-                          variant="outlined"
-                          size="small"
-                        />
-                      )}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {auction.description}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
+            <Link href={`/${auction.slug}`} key={auction._id}>
+              <a style={{ textDecoration: "none" }}>
+                <Card sx={{ my: 4 }}>
+                  <CardActionArea>
+                    <CardMedia
+                      component="img"
+                      height="175"
+                      image={auction.bannerImage}
+                    />
+                    <CardContent>
+                      <Typography gutterBottom variant="h5" component="div">
+                        {auction.title}
+                        {"\t"}
+                        {auction.biddingOpen && (
+                          <Chip
+                            label="Bidding Open"
+                            color="primary"
+                            variant="outlined"
+                            size="small"
+                          />
+                        )}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {auction.description}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </a>
             </Link>
           ))}
         </>

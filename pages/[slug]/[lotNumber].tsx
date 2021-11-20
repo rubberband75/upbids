@@ -7,15 +7,25 @@ import { signIn, useSession } from "next-auth/react"
 import DefaultErrorPage from "next/error"
 import {
   Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
   Divider,
+  FormControl,
+  Grid,
   Input,
   InputAdornment,
   OutlinedInput,
+  Paper,
   Skeleton,
   TextField,
+  Typography,
 } from "@mui/material"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import SquareImage from "../../components/SquareImage"
+import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 
 export default function LotNumberPage() {
   const router = useRouter()
@@ -32,6 +42,7 @@ export default function LotNumberPage() {
   let [errorMessage, setErrorMessage] = useState("")
   let [auctionItem, setAuctionItem] = useState<AuctionItem>(new AuctionItem())
   let [currentBid, setCurrentBid] = useState<Bid>()
+  let [bidAmount, setBidAmount] = useState(0)
 
   let [user, setUser] = useState({
     name: "",
@@ -47,7 +58,14 @@ export default function LotNumberPage() {
       .get(`/api/auctions/public/${slug}/${lotNumber}`)
       .then((response) => {
         setAuctionItem(response.data.auctionItem)
-        setCurrentBid(response.data.auctionEvent)
+        setCurrentBid(response.data.currentBid)
+
+        setBidAmount(
+          !currentBid
+            ? auctionItem?.startingBid || 0
+            : currentBid.amount + (auctionItem?.minimunIncrement || 0)
+        )
+        console.log({ bidAmount })
       })
       .catch((error: any) => {
         console.error({ error })
@@ -64,12 +82,6 @@ export default function LotNumberPage() {
   ): void => {
     setUser({ ...user, [e.currentTarget.name]: e.currentTarget.value })
   }
-
-  const [bidAmount, setBidAmount] = useState(
-    !currentBid
-      ? auctionItem?.startingBid || 0
-      : currentBid.amount + (auctionItem?.minimunIncrement || 0)
-  )
 
   const minNextBid = !currentBid
     ? auctionItem?.startingBid || 0
@@ -115,151 +127,172 @@ export default function LotNumberPage() {
       {loading && <Skeleton />}
       {!loading && !!auctionItem.lotNumber && (
         <>
-          <p>
-            <Link href={`/${slug}`}>
-              <Button variant="text"> {"<-"} All Items</Button>
-            </Link>
-          </p>
-          <div
-            style={{
-              backgroundImage: `url(${auctionItem.image})`,
-              width: "50%",
-              margin: "1em",
-              marginLeft: "0",
-            }}
-            className={"bannerImage"}
-          ></div>
+          <Link href={`/${slug}`}>
+            <Button sx={{ my: 0 }} variant="text" startIcon={<ArrowBackIcon />}>
+              All Items
+            </Button>
+          </Link>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item>
+              <SquareImage image={auctionItem.image} size={125} rounded />
+            </Grid>
+            <Grid item xs>
+              <Typography variant="overline" component="span">
+                Lot #{auctionItem.lotNumber?.toString().padStart(3, "0")}
+              </Typography>
+              <Typography variant="h5" gutterBottom component="h1">
+                {auctionItem.title}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Typography variant="body1" component="p">
+                {auctionItem.description}
+              </Typography>
+              <br />
+              <Typography
+                variant="subtitle1"
+                component="p"
+                color="text.secondary"
+              >
+                <i>
+                  Retail Value:{" "}
+                  {currencyFormatter.format(Number(auctionItem.retailValue))}
+                </i>
+              </Typography>
+            </Grid>
+          </Grid>
+
           <br />
-          <br />
-          <h1>{auctionItem.title}</h1>
-          <h2>Lot #{auctionItem.lotNumber?.toString().padStart(3, "0")}</h2>
-          <i>
-            Retail Value:{" "}
-            {currencyFormatter.format(Number(auctionItem.retailValue))}
-          </i>
-          <p>{auctionItem.description}</p>
-          <br />
+          <Divider />
           <br />
 
-          <h2>
-            {!!currentBid ? (
-              <>Current bid: {currencyFormatter.format(currentBid.amount)}</>
+          <Paper elevation={0} sx={{ textAlign: "center" }}>
+            <Typography variant="h4" gutterBottom component="div">
+              {!!currentBid ? "Current Bid" : "Starting Bid"}
+            </Typography>
+            <Typography variant="h3" gutterBottom component="div">
+              {!!currentBid
+                ? currencyFormatter.format(currentBid.amount)
+                : currencyFormatter.format(Number(auctionItem.startingBid))}
+            </Typography>
+
+            {typeof auctionItem.eventId === "object" &&
+            !auctionItem.eventId.biddingOpen ? (
+              <i>Bidding Not Yet Open</i>
             ) : (
               <>
-                Starting Bid:{" "}
-                {currencyFormatter.format(Number(auctionItem.startingBid))}
+                <label htmlFor="bid">
+                  <small>
+                    Minimum Bid: {currencyFormatter.format(Number(minNextBid))}
+                  </small>
+                </label>
+                <br />
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <OutlinedInput
+                    id="bid"
+                    type="number"
+                    name="bid"
+                    value={bidAmount}
+                    onChange={(e) => {
+                      setBidAmount(Number(e.currentTarget.value))
+                    }}
+                    // step="0.01"
+                    // placeholder="0.00"
+                    // min={minNextBid.toFixed(2)}
+                    startAdornment={
+                      <InputAdornment position="start">$</InputAdornment>
+                    }
+                  />
+                </FormControl>
+                {session && (
+                  <FormControl fullWidth>
+                    <Button variant="contained" size="large" onClick={placeBid}>
+                      Place Bid
+                    </Button>
+                  </FormControl>
+                )}
+                {!session && (
+                  <>
+                    <FormControl fullWidth>
+                      <Link href={`/api/auth/signin`}>
+                        <Button
+                          variant="outlined"
+                          size="large"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            signIn()
+                          }}
+                        >
+                          Sign in To Place Bid
+                        </Button>
+                      </Link>
+                    </FormControl>
+
+                    <Divider sx={{ my: 3 }} />
+
+                    <form onSubmit={placeGuestBid}>
+                      <Card sx={{ textAlign: "left" }}>
+                        <CardContent>
+                          <Typography
+                            variant="h6"
+                            color="text.secondary"
+                            gutterBottom
+                          >
+                            Bid As Guest
+                          </Typography>
+                          <FormControl fullWidth sx={{ my: 2 }}>
+                            <TextField
+                              label="Full Name"
+                              type="text"
+                              id="name"
+                              name="name"
+                              value={user.name}
+                              onChange={handleChange}
+                            />
+                          </FormControl>
+                          <FormControl fullWidth sx={{ my: 2 }}>
+                            <TextField
+                              label="Email"
+                              type="email"
+                              id="email"
+                              name="email"
+                              value={user.email}
+                              onChange={handleChange}
+                            />
+                          </FormControl>
+                          <FormControl fullWidth sx={{ my: 2 }}>
+                            <TextField
+                              label="Phone"
+                              type="tel"
+                              id="phone"
+                              name="phone"
+                              value={user.phone}
+                              onChange={handleChange}
+                            />
+                          </FormControl>
+                        </CardContent>
+                        <CardActions>
+                          <FormControl fullWidth>
+                            <Button
+                              variant="contained"
+                              size="large"
+                              type="submit"
+                              disabled={
+                                !user.name || !user.email || !user.phone
+                              }
+                            >
+                              Place Bid
+                            </Button>
+                          </FormControl>
+                        </CardActions>
+                      </Card>
+                    </form>
+                  </>
+                )}
               </>
             )}
-          </h2>
-
-          {typeof auctionItem.eventId === "object" &&
-          !auctionItem.eventId.biddingOpen ? (
-            <i>Bidding Not Yet Open</i>
-          ) : (
-            <>
-              <label htmlFor="bid">
-                <small>
-                  Minimum Bid: {currencyFormatter.format(Number(minNextBid))}
-                </small>
-              </label>
-              <br />
-              <OutlinedInput
-                id="bid"
-                type="number"
-                name="bid"
-                value={bidAmount}
-                onChange={(e) => {
-                  setBidAmount(Number(e.currentTarget.value))
-                }}
-                // step="0.01"
-                // placeholder="0.00"
-                // min={minNextBid.toFixed(2)}
-                startAdornment={
-                  <InputAdornment position="start">$</InputAdornment>
-                }
-              />
-              {session && (
-                <>
-                  <br />
-                  <Button variant="contained" size="large" onClick={placeBid}>
-                    Place Bid
-                  </Button>
-                </>
-              )}
-              {!session && (
-                <>
-                  <br />
-                  <br />
-                  <Link href={`/api/auth/signin`}>
-                    <Button
-                      variant="contained"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        signIn()
-                      }}
-                    >
-                      Sign in To Place Bid
-                    </Button>
-                  </Link>
-
-                  <br />
-                  <br />
-                  <Divider />
-
-                  <br />
-                  <br />
-                  <form onSubmit={placeGuestBid}>
-                    <fieldset>
-                      <legend>Bid Without an account</legend>
-                      <p>
-                        <label htmlFor="name">
-                          <span>Full Name</span>
-                        </label>
-                        <br />
-                        <OutlinedInput
-                          type="text"
-                          id="name"
-                          name="name"
-                          value={user.name}
-                          onChange={handleChange}
-                        />
-                      </p>
-                      <p>
-                        <label htmlFor="email">
-                          <span>Email Address</span>
-                        </label>
-                        <br />
-                        <OutlinedInput
-                          type="email"
-                          id="email"
-                          name="email"
-                          value={user.email}
-                          onChange={handleChange}
-                        />
-                      </p>
-                      <p>
-                        <label htmlFor="phone">
-                          <span>Phone Number</span>
-                        </label>
-                        <br />
-                        <OutlinedInput
-                          type="tel"
-                          id="phone"
-                          name="phone"
-                          value={user.phone}
-                          onChange={handleChange}
-                        />
-                      </p>
-
-                      <Button variant="contained" type="submit">
-                        Place Guest Bid
-                      </Button>
-                    </fieldset>
-                  </form>
-                </>
-              )}
-            </>
-          )}
+          </Paper>
         </>
       )}
       {!loading && (notFound || !auctionItem.lotNumber) && (

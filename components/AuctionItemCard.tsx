@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@mui/material"
 import AuctionItem from "../models/AuctionItem"
+import SquareImage from "./SquareImage"
 
 export default function AuctionItemCard({
   auctionItem,
@@ -27,18 +28,11 @@ export default function AuctionItemCard({
     <Card variant="outlined" sx={{ my: 3 }}>
       <CardActionArea>
         <Grid container spacing={0}>
-          <Grid item xs={4}>
-            <CardMedia
-              image={auctionItem.image}
-              sx={{
-                backgroundImage: `url(${auctionItem.image})`,
-                width: "100%",
-                height: "100%",
-              }}
-            />
+          <Grid item>
+            <SquareImage image={auctionItem.image} size={135} />
           </Grid>
 
-          <Grid item xs={8}>
+          <Grid item xs>
             <CardContent>
               <Typography variant="overline" component="span">
                 Lot #{auctionItem.lotNumber?.toString().padStart(3, "0")}

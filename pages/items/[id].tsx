@@ -28,6 +28,7 @@ import {
 } from "@mui/material"
 import DownloadIcon from "@mui/icons-material/Download"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
+import SquareImage from "../../components/SquareImage"
 
 export default function EditItemPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -231,27 +232,11 @@ export default function EditItemPage() {
           <form onSubmit={handleSubmit}>
             <Card>
               <CardContent>
-                {previewImage || auctionItem?.image ? (
-                  <CardMedia
-                    component="img"
-                    image={previewImage || auctionItem?.image}
-                    sx={{
-                      width: "250px",
-                      height: "250px",
-                      borderRadius: "5px",
-                    }}
-                  />
-                ) : (
-                  <Skeleton
-                    variant="rectangular"
-                    width={250}
-                    height={250}
-                    animation={false}
-                    sx={{
-                      borderRadius: "5px",
-                    }}
-                  />
-                )}
+                <SquareImage
+                  image={previewImage || auctionItem?.image}
+                  size={250}
+                  rounded
+                />
 
                 <Box sx={{ my: 2 }}>
                   <input

@@ -8,12 +8,16 @@ import axios from "axios"
 import {
   Alert,
   Button,
+  Card,
+  CardActions,
+  CardContent,
   Divider,
   FormControl,
   InputLabel,
   TextField,
   Typography,
 } from "@mui/material"
+import SquareImage from "../../components/SquareImage"
 
 export default function AccountIndex() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -148,85 +152,90 @@ export default function AccountIndex() {
         // Account Data Form
         <>
           <form onSubmit={handleSubmit}>
-            <FormControl fullWidth sx={{}}>
-              <div
-                style={{
-                  backgroundImage: `url(${previewImage || user.image})`,
-                }}
-                className={"profilePicture"}
-              ></div>
-            </FormControl>
-            <div>
-              <input
-                hidden
-                type="file"
-                accept="image/*"
-                ref={imageInputRef}
-                onChange={updateImage}
-              />
-              <Button
-                variant="contained"
-                type="button"
-                onClick={() => imageInputRef.current.click()}
-              >
-                Update Image
-              </Button>
-              {user.image && (
+            <Card>
+              <CardContent>
+                <SquareImage
+                  image={previewImage || user.image}
+                  size={250}
+                  rounded
+                />
+                <div>
+                  <input
+                    hidden
+                    type="file"
+                    accept="image/*"
+                    ref={imageInputRef}
+                    onChange={updateImage}
+                  />
+                  <Button
+                    variant="contained"
+                    type="button"
+                    onClick={() => imageInputRef.current.click()}
+                  >
+                    Update Image
+                  </Button>
+                  {user.image && (
+                    <Button
+                      type="button"
+                      onClick={deleteImage}
+                      sx={{ color: "rgb(219, 72, 72)" }}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                  {previewImage && (
+                    <Button type="button" onClick={resetImage}>
+                      Reset
+                    </Button>
+                  )}
+                </div>
+                <Divider sx={{ my: 3 }} />
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Full Name"
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={user.name}
+                    onChange={handleChange}
+                  />
+                </FormControl>
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Email"
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={user.email}
+                    onChange={handleChange}
+                  />
+                </FormControl>
+                <FormControl fullWidth sx={{ my: 2 }}>
+                  <TextField
+                    label="Phone"
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={user.phone}
+                    onChange={handleChange}
+                  />
+                </FormControl>
+              </CardContent>
+              <CardActions>
                 <Button
-                  type="button"
-                  onClick={deleteImage}
-                  sx={{ color: "rgb(219, 72, 72)" }}
+                  variant="contained"
+                  type="submit"
+                  disabled={!dataModified}
                 >
-                  Delete
+                  Save
                 </Button>
-              )}
-              {previewImage && (
-                <Button type="button" onClick={resetImage}>
-                  Reset
-                </Button>
-              )}
-            </div>
-            <Divider sx={{ my: 3 }} />
-            <FormControl fullWidth sx={{ my: 2 }}>
-              <TextField
-                label="Full Name"
-                type="text"
-                id="name"
-                name="name"
-                value={user.name}
-                onChange={handleChange}
-              />
-            </FormControl>
-            <FormControl fullWidth sx={{ my: 2 }}>
-              <TextField
-                label="Email"
-                type="email"
-                id="email"
-                name="email"
-                value={user.email}
-                onChange={handleChange}
-              />
-            </FormControl>
-            <FormControl fullWidth sx={{ my: 2 }}>
-              <TextField
-                label="Phone"
-                type="tel"
-                id="phone"
-                name="phone"
-                value={user.phone}
-                onChange={handleChange}
-              />
-            </FormControl>
-
-            <br />
-            <Button variant="contained" type="submit">
-              Save
-            </Button>
-            {dataModified && (
-              <Button type="button" onClick={getUser}>
-                Cancel
-              </Button>
-            )}
+                {dataModified && (
+                  <Button type="button" onClick={getUser}>
+                    Cancel
+                  </Button>
+                )}
+              </CardActions>
+            </Card>
           </form>
         </>
       )}

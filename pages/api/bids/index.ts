@@ -3,8 +3,10 @@ import runMiddleware from "../../../middleware/runMiddleware"
 import getCurrentUser from "../../../middleware/getCurrentUser"
 import connectToDB from "../../../middleware/connectToDB"
 import Bid from "../../../models/Bid"
+import logRequest from "../../../middleware/logRequest"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
+  await runMiddleware(req, res, logRequest)
   await runMiddleware(req, res, connectToDB)
   await runMiddleware(req, res, getCurrentUser)
 

@@ -5,8 +5,10 @@ import runMiddleware from "../../../middleware/runMiddleware"
 import User from "../../../models/user"
 import multer from "multer"
 import uploadCoudinaryImage from "../../../lib/cloudinary"
+import logRequest from "../../../middleware/logRequest"
 
 const handler = async (req: any, res: NextApiResponse) => {
+  await runMiddleware(req, res, logRequest)
   await runMiddleware(req, res, multer().single("file"))
 
   const { method } = req

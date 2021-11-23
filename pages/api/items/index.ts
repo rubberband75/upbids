@@ -5,8 +5,10 @@ import connectToDB from "../../../middleware/connectToDB"
 import multer from "multer"
 import uploadCoudinaryImage from "../../../lib/cloudinary"
 import AuctionItem from "../../../models/AuctionItem"
+import logRequest from "../../../middleware/logRequest"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
+  await runMiddleware(req, res, logRequest)
   await runMiddleware(req, res, multer().single("file"))
   await runMiddleware(req, res, connectToDB)
   await runMiddleware(req, res, getCurrentUser)

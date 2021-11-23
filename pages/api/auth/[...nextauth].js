@@ -4,8 +4,11 @@ import GoogleProvider from "next-auth/providers/google"
 import FacebookProvider from "next-auth/providers/facebook"
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter"
 import clientPromise from "../../../lib/mongodb"
+import logRequest from "../../../middleware/logRequest"
+import runMiddleware from "../../../middleware/runMiddleware"
 
 export default async function auth(req, res) {
+  await runMiddleware(req, res, logRequest)
 
   const database = process.env.MONGODB_DATABASE
 

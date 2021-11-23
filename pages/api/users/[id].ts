@@ -1,8 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next"
+import logRequest from "../../../middleware/logRequest"
 import connectDB from "../../../middleware/mongodb"
+import runMiddleware from "../../../middleware/runMiddleware"
 import User from "../../../models/user"
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  await runMiddleware(req, res, logRequest)
   const {
     query: { id, name },
     method,

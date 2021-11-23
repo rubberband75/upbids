@@ -3,8 +3,10 @@ import runMiddleware from "../../../../../middleware/runMiddleware"
 import AuctionEvent from "../../../../../models/AuctionEvent"
 import connectToDB from "../../../../../middleware/connectToDB"
 import AuctionItem from "../../../../../models/AuctionItem"
+import logRequest from "../../../../../middleware/logRequest"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
+  await runMiddleware(req, res, logRequest)
   await runMiddleware(req, res, connectToDB)
 
   const {

@@ -6,8 +6,10 @@ import Bid from "../../../models/Bid"
 import User from "../../../models/user"
 import AuctionItem from "../../../models/AuctionItem"
 import AuctionEvent from "../../../models/AuctionEvent"
+import logRequest from "../../../middleware/logRequest"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
+  await runMiddleware(req, res, logRequest)
   await runMiddleware(req, res, connectToDB)
   await runMiddleware(req, res, getCurrentUser)
 

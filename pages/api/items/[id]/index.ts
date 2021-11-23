@@ -24,7 +24,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   // Load Item
   let auctionItem: AuctionItem
   try {
-    auctionItem = await AuctionItem.findOne({ _id: id }).populate('eventId')
+    auctionItem = await AuctionItem.findOne({ _id: id }).populate("eventId")
     if (!auctionItem) return res.status(404).json({ error: "Item Not Found" })
   } catch (error) {
     return res.status(500).json({ error: "Error Loading Item" })
@@ -33,7 +33,6 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   switch (method) {
     case "GET":
       return res.json({ auctionItem })
-      break
     case "PATCH":
       try {
         // Extract fields from req body
@@ -50,14 +49,32 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         } = req.body || {}
 
         // Check for Lot Numbers
-        if (lotNumber && lotNumber != auctionItem.lotNumber) {
+        if (
+          lotNumber &&
+          lotNumber != auctionItem.lotNumber &&
+          typeof auctionItem.eventId === "object"
+        ) {
           let existingLot: AuctionItem = await AuctionItem.findOne({
-            eventId,
+            eventId: auctionItem.eventId._id.toString(),
             lotNumber,
           })
           if (existingLot)
             return res.status(400).json({ error: "Lot Number Taken" })
         }
+
+        // Validate Money Values
+        if (retailValue != undefined && retailValue <= 0)
+          return res
+            .status(400)
+            .json({ error: "retailValue must be greater than 0" })
+        if (startingBid != undefined && startingBid <= 0)
+          return res
+            .status(400)
+            .json({ error: "startingBid must be greater than 0" })
+        if (minimunIncrement != undefined && minimunIncrement <= 0)
+          return res
+            .status(400)
+            .json({ error: "minimunIncrement must be greater than 0" })
 
         if (title != undefined) auctionItem.title = title
         if (description != undefined) auctionItem.description = description

@@ -80,7 +80,7 @@ export default function EditItemPage() {
       let response = await axios.post(`/api/items`, formData)
 
       // Redirect to new item
-      window.location.href = `/items/${response.data.auctionItem._id}`
+      router.push(`/items/${response.data.auctionItem._id}`)
     } catch (error: any) {
       console.log({ error })
       try {

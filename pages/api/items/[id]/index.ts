@@ -62,23 +62,18 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
             return res.status(400).json({ error: "Lot Number Taken" })
         }
 
-        // Validate Money Values
+        // Validate Numeric Values
+        if (lotNumber != undefined && lotNumber <= 0)
+          throw "Lot Number must be greater than 0"
         if (retailValue != undefined && retailValue <= 0)
-          return res
-            .status(400)
-            .json({ error: "retailValue must be greater than 0" })
+          throw "Retail Value must be greater than 0"
         if (startingBid != undefined && startingBid <= 0)
-          return res
-            .status(400)
-            .json({ error: "startingBid must be greater than 0" })
+          throw "Starting Bid must be greater than 0"
         if (minimunIncrement != undefined && minimunIncrement <= 0)
-          return res
-            .status(400)
-            .json({ error: "minimunIncrement must be greater than 0" })
+          throw "Minimun Increment must be greater than 0"
 
         if (title != undefined) auctionItem.title = title
         if (description != undefined) auctionItem.description = description
-        if (image != undefined) auctionItem.image = image
         if (lotNumber != undefined) auctionItem.lotNumber = lotNumber
         if (retailValue != undefined) auctionItem.retailValue = retailValue
         if (startingBid != undefined) auctionItem.startingBid = startingBid
@@ -95,7 +90,8 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
             console.error(error)
             return res.status(500).json({ error: "Error Uploading Image" })
           }
-        }
+        } else if (image != undefined) auctionItem.image = image
+
         auctionItem.save()
         return res.json({ auctionItem })
       } catch (error: any) {

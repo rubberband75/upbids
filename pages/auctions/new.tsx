@@ -13,9 +13,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material"
+import { useRouter } from "next/router"
 
 export default function NewAuctionPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
+  const router = useRouter()
 
   let [errorMessage, setErrorMessage] = useState("")
   let [loading, setLoading] = useState(true)
@@ -45,7 +47,7 @@ export default function NewAuctionPage() {
       let result = await axios.post("/api/auctions", formData)
 
       // Redirect to new event
-      window.location.href = `/auctions/${result.data._id}`
+      router.push(`/auctions/${result.data._id}`)
     } catch (error: any) {
       try {
         setErrorMessage(`Error: ${error.response.data.error}`)
@@ -55,8 +57,6 @@ export default function NewAuctionPage() {
     } finally {
       setLoading(false)
     }
-
-    // updateUser()
   }
 
   const handleChange = (

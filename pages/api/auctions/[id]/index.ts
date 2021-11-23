@@ -40,14 +40,14 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   switch (method) {
     case "GET":
       let auctionItems: AuctionItem[] = await AuctionItem.find({
-        eventId: auctionEvent._id
+        eventId: auctionEvent._id,
       })
 
       return res.json({ auctionEvent, auctionItems })
     case "PATCH":
       try {
         // Extract fields from req body
-        let { title, description, slug, published, biddingOpen } =
+        let { title, description, slug, published, biddingOpen, bannerImage } =
           req.body || {}
 
         // Check for duplicate slugs
@@ -67,7 +67,8 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
               .status(500)
               .json({ error: `${error}` || "Error Uploading Image" })
           }
-        }
+        } else if (bannerImage != undefined)
+          auctionEvent.bannerImage = bannerImage
 
         // Upding existing event
         if (title != undefined) auctionEvent.title = title
@@ -78,7 +79,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
         // Save and return event object
         await auctionEvent.save()
-        return res.json({auctionEvent})
+        return res.json({ auctionEvent })
       } catch (error) {
         // Thow 500 error if any uncaught errors occure
         console.error(error)

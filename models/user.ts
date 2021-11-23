@@ -7,6 +7,7 @@ interface User extends mongoose.Document {
   image?: string
   phone?: string
   emailVerified?: Boolean
+  guestEmail?: string
 }
 
 const user = new Schema<User>({
@@ -28,11 +29,15 @@ const user = new Schema<User>({
     required: false,
   },
   emailVerified: {
-    type: Date,
+    type: Boolean,
+    required: false,
+  },
+  guestEmail: {
+    type: String,
     required: false,
   },
 })
 
-var User = mongoose.models.User || mongoose.model<User>("User", user)
+var User = mongoose.models?.User || mongoose.model<User>("User", user)
 
 export default User

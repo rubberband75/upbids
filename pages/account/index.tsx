@@ -18,9 +18,11 @@ import {
   Typography,
 } from "@mui/material"
 import SquareImage from "../../components/SquareImage"
+import { useRouter } from "next/router"
 
 export default function AccountIndex() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
+  const router = useRouter()
 
   let [errorMessage, setErrorMessage] = useState("")
   let [loading, setLoading] = useState(true)
@@ -134,6 +136,16 @@ export default function AccountIndex() {
     setDataModified(true)
   }
 
+  const deleteAccount = async () => {
+    try {
+      await axios.delete("/api/users/delete-account")
+      window.location.href = "/"
+    } catch (e) {
+      console.error({ error: e })
+    } finally {
+    }
+  }
+
   return (
     <Layout>
       <Typography variant="h4" component="h1" sx={{ my: 2 }}>
@@ -237,6 +249,24 @@ export default function AccountIndex() {
               </CardActions>
             </Card>
           </form>
+
+          <Divider sx={{ mt: 6, mb: 1 }} />
+          <Button
+            variant="text"
+            type="button"
+            size="small"
+            onClick={() => {
+              if (
+                confirm(
+                  "Are you sure you want to delete your account and all of your data?"
+                )
+              ) {
+                deleteAccount()
+              }
+            }}
+          >
+            Delete My Account
+          </Button>
         </>
       )}
     </Layout>

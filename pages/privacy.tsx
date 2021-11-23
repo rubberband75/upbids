@@ -136,6 +136,16 @@ export default function PrivacyPage() {
         be able to do necessary actions.
       </p>
 
+      <h2>Data Deletion</h2>
+
+      <p>
+        If you wish to delete any data you have provided, or which has been
+        collected from third party services, such as Facebook, you may navigate
+        to your account page at{" "}
+        <a href="/account">https://www.upbids.net/account</a>, and click the
+        button labled: "Delete My Account"
+      </p>
+
       <h2>Changes to This Privacy Policy</h2>
 
       <p>

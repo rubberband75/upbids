@@ -136,7 +136,7 @@ export default function PrivacyPage() {
         be able to do necessary actions.
       </p>
 
-      <h2>Data Deletion</h2>
+      <h2 id="data-deletion">Data Deletion</h2>
 
       <p>
         If you wish to delete any data you have provided, or which has been

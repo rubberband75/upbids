@@ -89,7 +89,9 @@ export default function UpBidsAppBar() {
 
         {session && (
           <>
-            <span>Welcome, {session.user?.name?.split(" ")[0]}</span>
+            <span style={{ textAlign: "right" }}>
+              Welcome, {session.user?.name?.split(" ")[0]}
+            </span>
             <div>
               <IconButton
                 size="large"
@@ -245,6 +247,13 @@ export default function UpBidsAppBar() {
           </ListItem>
 
           <Divider sx={{ marginTop: "auto" }} />
+          <ListItem disablePadding>
+            <Link href="/terms">
+              <ListItemButton component="a">
+                <ListItemText primary="Terms" />
+              </ListItemButton>
+            </Link>
+          </ListItem>
           <ListItem disablePadding>
             <Link href="/privacy">
               <ListItemButton component="a">

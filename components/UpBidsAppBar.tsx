@@ -25,6 +25,7 @@ import PersonIcon from "@mui/icons-material/Person"
 import EventIcon from "@mui/icons-material/Event"
 import LoyaltyIcon from "@mui/icons-material/Loyalty"
 import ExploreIcon from "@mui/icons-material/Explore"
+import { Box } from "@mui/system"
 
 export default function UpBidsAppBar() {
   const { data: session, status } = useSession()
@@ -170,7 +171,14 @@ export default function UpBidsAppBar() {
         )}
       </Toolbar>
       <Drawer anchor="left" open={showDrawer} onClose={toggleDrawer}>
-        <List sx={{ minWidth: "15em" }}>
+        <List
+          sx={{
+            minWidth: "15em",
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+          }}
+        >
           {!session && (
             <ListItem disablePadding>
               <ListItemButton
@@ -232,6 +240,15 @@ export default function UpBidsAppBar() {
                   <ExploreIcon />
                 </ListItemIcon>
                 <ListItemText primary="Discover" />
+              </ListItemButton>
+            </Link>
+          </ListItem>
+
+          <Divider sx={{ marginTop: "auto" }} />
+          <ListItem disablePadding>
+            <Link href="/privacy">
+              <ListItemButton component="a">
+                <ListItemText primary="Privacy Policy" />
               </ListItemButton>
             </Link>
           </ListItem>

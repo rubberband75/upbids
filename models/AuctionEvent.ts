@@ -10,6 +10,7 @@ interface AuctionEvent extends mongoose.Document {
   slug?: string
   published?: Boolean
   biddingOpen?: Boolean
+  managers?: Array<string | User>
 }
 
 const auctionEvent = new Schema({
@@ -48,8 +49,15 @@ const auctionEvent = new Schema({
     required: true,
     default: false,
   },
+  managers: {
+    type: Array,
+    required: false,
+    default: [],
+  },
 })
 
-var AuctionEvent = mongoose.models?.AuctionEvent || mongoose.model<AuctionEvent>("AuctionEvent", auctionEvent)
+var AuctionEvent =
+  mongoose.models?.AuctionEvent ||
+  mongoose.model<AuctionEvent>("AuctionEvent", auctionEvent)
 
 export default AuctionEvent

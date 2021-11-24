@@ -39,7 +39,6 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   // Check if current user is owner or manager of event
   let isOwner = `${auctionEvent.userId}` === `${req.user._id}`
   let isManager = auctionEvent.managers?.some((user) => {
-    console.log(user)
     if (typeof user === "object") return `${user._id}` == `${req.user._id}`
     else return `${user}` != `${req.user._id}`
   })

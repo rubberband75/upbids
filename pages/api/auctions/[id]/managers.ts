@@ -49,8 +49,6 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
         let currentManagers = auctionEvent.managers || []
 
-        console.log("In list", currentManagers.includes(newManager._id))
-
         if (currentManagers.includes(newManager._id))
           return res.status(400).json({ error: "User already a manager" })
 

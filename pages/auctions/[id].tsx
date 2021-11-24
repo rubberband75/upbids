@@ -15,13 +15,22 @@ import {
   FormControlLabel,
   FormGroup,
   InputAdornment,
+  Paper,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from "@mui/material"
 import { Box } from "@mui/system"
 import LaunchIcon from "@mui/icons-material/Launch"
 import AuctionItemCard from "../../components/AuctionItemCard"
+import User from "../../models/user"
+import AuctionEvent from "../../models/AuctionEvent"
 
 export default function EditAuctionPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -31,20 +40,15 @@ export default function EditAuctionPage() {
 
   let [loading, setLoading] = useState(true)
   let [errorMessage, setErrorMessage] = useState("")
-  let [event, setEvent] = useState({
-    _id: "",
-    bannerImage: "",
-    title: "",
-    description: "",
-    slug: "",
-    published: false,
-    biddingOpen: false,
-  })
+  let [event, setEvent] = useState<AuctionEvent>()
   const [selectedFile, setSelectedFile] = useState<File | null>()
   const [previewImage, setPreviewImage] = useState("")
   const [dataModified, setDataModified] = useState(false)
 
-  let [auctionItems, setAuctionItems] = useState<AuctionItem[]>([])
+  const [auctionItems, setAuctionItems] = useState<AuctionItem[]>([])
+
+  const [collaboratorEmail, setCollaboratorEmail] = useState("")
+  const [collaboratorError, setCollaboratorError] = useState("")
 
   const getEvent = () => {
     setErrorMessage("")
@@ -52,17 +56,7 @@ export default function EditAuctionPage() {
     axios
       .get(`/api/auctions/${id}`)
       .then((response) => {
-        setEvent({
-          ...event,
-          _id: response.data.auctionEvent._id || "",
-          bannerImage: response.data.auctionEvent.bannerImage || "",
-          title: response.data.auctionEvent.title || "",
-          description: response.data.auctionEvent.description || "",
-          slug: response.data.auctionEvent.slug || "",
-          published: response.data.auctionEvent.published || false,
-          biddingOpen: response.data.auctionEvent.biddingOpen || false,
-        })
-
+        setEvent(response.data.auctionEvent)
         setAuctionItems(response.data.auctionItems)
         setDataModified(false)
       })
@@ -83,28 +77,26 @@ export default function EditAuctionPage() {
     setErrorMessage("")
 
     const formData = new FormData()
-    formData.append("bannerImage", event.bannerImage)
-    formData.append("title", event.title)
-    formData.append("description", event.description)
-    formData.append("slug", event.slug)
-    formData.append("published", event.published.toString())
-    formData.append("biddingOpen", event.biddingOpen.toString())
+    let eventData: any = { ...event }
+    for (const key in eventData) {
+      if (eventData[key] !== null && eventData[key] !== undefined)
+        formData.append(key, eventData[key].toString())
+    }
+
+    // formData.append("bannerImage", event?.bannerImage)
+    // formData.append("title", event?.title)
+    // formData.append("description", event?.description)
+    // formData.append("slug", event?.slug)
+    // formData.append("published", event?.published.toString())
+    // formData.append("biddingOpen", event?.biddingOpen.toString())
 
     if (selectedFile) {
       formData.append("bannerImage", selectedFile)
     }
 
     try {
-      let response = await axios.patch(`/api/auctions/${event._id}`, formData)
-      setEvent({
-        ...event,
-        bannerImage: response.data.auctionEvent.bannerImage || "",
-        title: response.data.auctionEvent.title || "",
-        description: response.data.auctionEvent.description || "",
-        slug: response.data.auctionEvent.slug || "",
-        published: response.data.auctionEvent.published || false,
-        biddingOpen: response.data.auctionEvent.biddingOpen || false,
-      })
+      let response = await axios.patch(`/api/auctions/${event?._id}`, formData)
+      setEvent(response.data.auctionEvent)
 
       resetImage()
       setDataModified(false)
@@ -123,7 +115,9 @@ export default function EditAuctionPage() {
   const handleChange = (
     e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void => {
-    setEvent({ ...event, [e.currentTarget.name]: e.currentTarget.value })
+    let eventData: any = { ...event }
+    eventData[e.currentTarget.name] = e.currentTarget.value
+    setEvent(eventData)
     setDataModified(true)
   }
 
@@ -150,10 +144,8 @@ export default function EditAuctionPage() {
 
   const deleteImage = () => {
     resetImage()
-    setEvent({
-      ...event,
-      bannerImage: "",
-    })
+    let eventData: any = { ...event, bannerImage: "" }
+    setEvent(eventData)
     setDataModified(true)
   }
 
@@ -165,6 +157,33 @@ export default function EditAuctionPage() {
     } catch (error: any) {
       setErrorMessage(`${error.response.data.error}`)
       setLoading(false)
+    }
+  }
+
+  const addCollaborator = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setCollaboratorError("")
+    try {
+      await axios.post(`/api/auctions/${event?._id}/managers`, {
+        email: collaboratorEmail,
+      })
+      setCollaboratorEmail("")
+      getEvent()
+    } catch (error) {
+      setCollaboratorError("Error Adding Collaborator")
+    }
+  }
+
+  const deleteCollaborator = async (email: string) => {
+    setCollaboratorError("")
+    try {
+      await axios.delete(`/api/auctions/${event?._id}/managers`, {
+        data: { email },
+      })
+      setCollaboratorEmail("")
+      getEvent()
+    } catch (error) {
+      setCollaboratorError("Error Deleting Collaborator")
     }
   }
 
@@ -185,7 +204,7 @@ export default function EditAuctionPage() {
         >
           Edit Auction
         </Typography>
-        {event.published && event.slug && (
+        {event?.published && event?.slug && (
           <Link href={`/${event.slug}`}>
             <Button variant="text" endIcon={<LaunchIcon />}>
               View Public Page
@@ -193,7 +212,7 @@ export default function EditAuctionPage() {
           </Link>
         )}
       </Box>
-      <Divider />
+      <Divider sx={{ mb: 2 }} />
       {errorMessage && (
         // Error Message
         <p className={"error-message"}>{errorMessage}</p>
@@ -212,7 +231,7 @@ export default function EditAuctionPage() {
               <CardMedia
                 component="img"
                 height="250"
-                image={previewImage || event.bannerImage}
+                image={previewImage || event?.bannerImage}
               />
 
               <CardContent>
@@ -232,7 +251,7 @@ export default function EditAuctionPage() {
                   >
                     Update Image
                   </Button>
-                  {event.bannerImage && (
+                  {event?.bannerImage && (
                     <Button
                       type="button"
                       size="small"
@@ -256,7 +275,7 @@ export default function EditAuctionPage() {
                     type="text"
                     id="title"
                     name="title"
-                    value={event.title}
+                    value={event?.title}
                     onChange={handleChange}
                   />
                 </FormControl>
@@ -267,7 +286,7 @@ export default function EditAuctionPage() {
                     id="description"
                     name="description"
                     rows={5}
-                    value={event.description}
+                    value={event?.description}
                     onChange={handleChange}
                     placeholder="Auction Description..."
                   />
@@ -278,7 +297,7 @@ export default function EditAuctionPage() {
                     type="text"
                     id="slug"
                     name="slug"
-                    value={event.slug}
+                    value={event?.slug}
                     onChange={handleChange}
                     InputProps={{
                       startAdornment: (
@@ -296,9 +315,13 @@ export default function EditAuctionPage() {
                     label="Published"
                     control={
                       <Switch
-                        checked={event.published}
+                        checked={!!event?.published}
                         onChange={() => {
-                          setEvent({ ...event, published: !event.published })
+                          let eventData: any = {
+                            ...event,
+                            published: !event?.published,
+                          }
+                          setEvent(eventData)
                           setDataModified(true)
                         }}
                       />
@@ -308,12 +331,13 @@ export default function EditAuctionPage() {
                     label="Bidding Open"
                     control={
                       <Switch
-                        checked={event.biddingOpen}
+                        checked={!!event?.biddingOpen}
                         onChange={() => {
-                          setEvent({
+                          let eventData: any = {
                             ...event,
-                            biddingOpen: !event.biddingOpen,
-                          })
+                            biddingOpen: !event?.biddingOpen,
+                          }
+                          setEvent(eventData)
                           setDataModified(true)
                         }}
                       />
@@ -338,9 +362,10 @@ export default function EditAuctionPage() {
             </Card>
           </form>
 
-          <br />
-          <h2>Auction Items</h2>
-          <hr />
+          <Typography variant="h5" component="h2" sx={{ mt: 6 }}>
+            Auction Items
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
           {!auctionItems.length && (
             <div>
               <i>You haven't added any auction items</i>
@@ -359,10 +384,80 @@ export default function EditAuctionPage() {
             </Button>
           </Link>
 
-          <br />
-          <br />
-          <h2>Danger Zone</h2>
-          <hr />
+          <Typography variant="h5" component="h2" sx={{ mt: 6 }}>
+            Collaborators
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
+          <i>
+            Enter the email address of the UpBids account you wish to share
+            access with, and they will be invited to see and update this event.
+          </i>
+          <form onSubmit={addCollaborator}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                my: 1,
+              }}
+            >
+              <TextField
+                label="Email"
+                type="email"
+                id="email"
+                name="email"
+                size="small"
+                value={collaboratorEmail}
+                onChange={(e) => {
+                  setCollaboratorEmail(e.currentTarget.value)
+                }}
+                sx={{ flexGrow: 1, mr: 1 }}
+              />
+              <Button type="submit" variant="contained">
+                Invite
+              </Button>
+            </Box>
+          </form>
+
+          <Table size="small" sx={{ mt: 2 }}>
+            <TableBody>
+              {event?.managers?.map((user) => {
+                if (typeof user === "object")
+                  return (
+                    <TableRow
+                      key={user._id}
+                      sx={{
+                        "&:last-child td, &:last-child th": { border: 0 },
+                      }}
+                    >
+                      <TableCell>{user.name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <Button
+                          size="small"
+                          name={user.email}
+                          onClick={(e) => {
+                            if (
+                              confirm(
+                                "Are you sure you want to remove this collaborator?"
+                              )
+                            ) {
+                              deleteCollaborator(e.currentTarget.name)
+                            }
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
+              })}
+            </TableBody>
+          </Table>
+
+          <Typography variant="h5" component="h2" sx={{ mt: 6 }}>
+            Danger Zone
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
           <Button
             variant="contained"
             type="button"

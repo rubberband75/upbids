@@ -44,6 +44,8 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         let email = req.body.email
         if (!email) return res.status(400).json({ error: "Must Provide Email" })
         let newManager = await User.findOne({ email: email })
+        if (!newManager)
+          return res.status(400).json({ error: "User Not Found" })
 
         let currentManagers = auctionEvent.managers || []
 
@@ -66,8 +68,35 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           .status(500)
           .json({ error: `${error}` || "Error Adding Manager" })
       }
+    case "DELETE":
+      try {
+        let email = req.body.email
+        if (!email) return res.status(400).json({ error: "Must Provide Email" })
+        let exManager = await User.findOne({ email: email })
+        if (!exManager) return res.status(400).json({ error: "User Not Found" })
+
+        let currentManagers = auctionEvent.managers || []
+
+        if (!currentManagers.includes(exManager._id))
+          return res.status(400).json({ error: "User not in manager list" })
+
+        let newManagerList = currentManagers.filter(
+          (user) => `${user}` !== `${exManager._id}`
+        )
+
+        auctionEvent.managers = newManagerList
+        await auctionEvent.save()
+        auctionEvent = await AuctionEvent.findOne({ _id: id })
+
+        return res.json({ auctionEvent })
+      } catch (error) {
+        return res
+          .status(500)
+          .json({ error: `${error}` || "Error Deleting Manager" })
+      }
+
     default:
-      res.setHeader("Allow", ["POST"])
+      res.setHeader("Allow", ["POST", "DELETE"])
       res.status(405).end(`Method ${method} Not Allowed`)
   }
 }

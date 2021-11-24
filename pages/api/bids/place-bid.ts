@@ -33,7 +33,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           }
           let newUser: User = await User.create({
             name: fullName,
-            email: email,
+            guestEmail: email,
             phone: phone,
           })
           userId = newUser._id

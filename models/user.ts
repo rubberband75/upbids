@@ -3,7 +3,7 @@ const Schema = mongoose.Schema
 
 interface User extends mongoose.Document {
   name: string
-  email: string
+  email?: string
   image?: string
   phone?: string
   emailVerified?: Boolean

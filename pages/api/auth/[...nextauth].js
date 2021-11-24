@@ -18,12 +18,11 @@ export default async function auth(req, res) {
     }),
     // database: process.env.MONGODB_URI,
     providers: [
-      // EmailProvider({
-      //   server: process.env.EMAIL_SERVER,
-      //   from: process.env.EMAIL_FROM,
-      //   // maxAge: 24 * 60 * 60, // How long email links are valid for (default 24h)
-      //   sendVerificationRequest: (requestData) => { console.log("sent verification request", { ...requestData }) }
-      // }),
+      EmailProvider({
+        server: process.env.EMAIL_SERVER,
+        from: process.env.EMAIL_FROM,
+        // maxAge: 24 * 60 * 60, // How long email links are valid for (default 24h)
+      }),
       GoogleProvider({
         clientId: process.env.GOOGLE_ID,
         clientSecret: process.env.GOOGLE_SECRET,

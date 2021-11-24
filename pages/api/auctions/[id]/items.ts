@@ -37,7 +37,9 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
   switch (method) {
     case "GET":
-      let auctionItems: AuctionItem[] = await AuctionItem.find({ eventId: id })
+      let auctionItems: AuctionItem[] = await AuctionItem.find({
+        eventId: id,
+      }).sort("lotNumber")
       res.json(auctionItems)
       break
     default:

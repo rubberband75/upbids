@@ -43,7 +43,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
     case "GET":
       let auctionItems: AuctionItem[] = await AuctionItem.find({
         eventId: auctionEvent._id,
-      })
+      }).sort("lotNumber")
 
       return res.json({ auctionEvent, auctionItems })
     case "PATCH":

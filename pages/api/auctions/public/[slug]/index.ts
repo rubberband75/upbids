@@ -29,7 +29,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         let auctionItems: AuctionItem[] = await AuctionItem.find({
           eventId: auctionEvent._id,
           published: true,
-        })
+        }).sort("lotNumber")
 
         res.json({ auctionEvent, auctionItems })
       } catch (error) {

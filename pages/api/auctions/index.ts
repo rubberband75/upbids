@@ -22,7 +22,13 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       let auctionEvents: AuctionEvent[] = await AuctionEvent.find({
         userId: req.user?._id,
       })
-      res.json(auctionEvents)
+      let sharedEvents: AuctionEvent[] = await AuctionEvent.find(
+        {
+          managers: req.user?._id,
+        },
+        "-managers"
+      )
+      res.json({ auctionEvents, sharedEvents })
       break
     case "POST":
       // Extract fields from req body

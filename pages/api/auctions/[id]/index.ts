@@ -26,15 +26,26 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   // Load AuctionEvent
   let auctionEvent: AuctionEvent
   try {
-    auctionEvent = await AuctionEvent.findOne({ _id: id })
+    auctionEvent = await AuctionEvent.findOne({ _id: id }).populate(
+      "managers",
+      "_id name email"
+    )
     if (!auctionEvent)
       return res.status(404).json({ error: "Auction Not Found" })
   } catch (error) {
     return res.status(500).json({ error: "Error Loading Auction" })
   }
 
-  // Check that Event is owned by current user
-  if (`${auctionEvent.userId}` != `${req.user._id}`)
+  // Check if current user is owner or manager of event
+  let isOwner = `${auctionEvent.userId}` === `${req.user._id}`
+  let isManager = auctionEvent.managers?.some((user) => {
+    console.log(user)
+    if (typeof user === "object") return `${user._id}` == `${req.user._id}`
+    else return `${user}` != `${req.user._id}`
+  })
+
+  // Check that Event is owned or managed by current user
+  if (!(isOwner || isManager))
     return res
       .status(403)
       .json({ error: "You do not have permission to view this event" })
@@ -44,6 +55,9 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       let auctionItems: AuctionItem[] = await AuctionItem.find({
         eventId: auctionEvent._id,
       }).sort("lotNumber")
+
+      // Hide manager list from managers
+      if (isManager) auctionEvent.managers = undefined
 
       return res.json({ auctionEvent, auctionItems })
     case "PATCH":
@@ -90,6 +104,12 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           .json({ error: `${error}` || "Error Updating Event" })
       }
     case "DELETE":
+      // Hide manager list from managers
+      if (isManager)
+        return res
+          .status(403)
+          .json({ error: "You do not have permission to delete this event" })
+
       try {
         await auctionEvent.delete()
         return res.end(`Item Deleted: ${id}`)

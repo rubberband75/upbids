@@ -49,11 +49,13 @@ const auctionEvent = new Schema({
     required: true,
     default: false,
   },
-  managers: {
-    type: Array,
-    required: false,
-    default: [],
-  },
+  managers: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
+    },
+  ],
 })
 
 var AuctionEvent =

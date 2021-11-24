@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react"
 import axios from "axios"
 import Link from "next/link"
 import {
+  Alert,
   Button,
   Card,
   CardActionArea,
@@ -18,18 +19,21 @@ import PublicOffIcon from "@mui/icons-material/PublicOff"
 import EventAvailableIcon from "@mui/icons-material/EventAvailable"
 import EventBusyIcon from "@mui/icons-material/EventBusy"
 import AuctionEventCardSkeleton from "../../components/AuctionEventCardSkeleton"
+import AuctionEventCard from "../../components/AuctionEventCard"
 
 export default function MyAuctions() {
   let [loading, setLoading] = useState(true)
   let [errorMessage, setErrorMessage] = useState("")
   let [auctions, setAuctions] = useState<Array<any>>([])
+  let [sharedEvents, setSharedEvents] = useState<Array<any>>([])
 
   const getAuctions = () => {
     setErrorMessage("")
     axios
       .get("/api/auctions")
       .then((response) => {
-        setAuctions([...response.data])
+        setAuctions([...response.data.auctionEvents])
+        setSharedEvents([...response.data.sharedEvents])
       })
       .catch((error) => {
         console.error(error)
@@ -48,7 +52,7 @@ export default function MyAuctions() {
       </Typography>
       <Divider />
       {/* // Error Message */}
-      {errorMessage && <p className={"error-message"}>{errorMessage}</p>}
+      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
       {/* // Loaing Skeleton */}
       {loading && <AuctionEventCardSkeleton bannerHeight={140} />}
       {/* // Account Data Form */}
@@ -62,64 +66,9 @@ export default function MyAuctions() {
 
           {auctions.map((auctionEvent) => (
             <Link href={`/auctions/${auctionEvent._id}`} key={auctionEvent._id}>
-              <Card sx={{ my: 4 }}>
-                <CardActionArea>
-                  {auctionEvent.bannerImage && (
-                    <CardMedia
-                      component="img"
-                      height="140"
-                      image={auctionEvent.bannerImage}
-                    />
-                  )}
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                      {auctionEvent.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      component="div"
-                      sx={{
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {auctionEvent.description}
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Typography variant="body2">
-                      {auctionEvent.published ? (
-                        <Chip
-                          icon={<PublicIcon />}
-                          label="Published"
-                          variant="outlined"
-                        />
-                      ) : (
-                        <Chip
-                          icon={<PublicOffIcon />}
-                          label="Unpublished"
-                          variant="outlined"
-                        />
-                      )}{" "}
-                      {auctionEvent.biddingOpen ? (
-                        <Chip
-                          icon={<EventAvailableIcon />}
-                          label="Bidding Open"
-                          variant="outlined"
-                        />
-                      ) : (
-                        <Chip
-                          icon={<EventBusyIcon />}
-                          label="Bidding Closed"
-                          variant="outlined"
-                        />
-                      )}
-                    </Typography>
-                  </CardActions>
-                </CardActionArea>
-              </Card>
+              <a style={{ textDecoration: "none" }}>
+                <AuctionEventCard auctionEvent={auctionEvent} />
+              </a>
             </Link>
           ))}
           <Link href="/auctions/new">
@@ -127,6 +76,25 @@ export default function MyAuctions() {
               + Create New Auction
             </Button>
           </Link>
+
+          {sharedEvents.length > 0 && (
+            <>
+              <Typography variant="h4" component="h1" sx={{ mt: 8, mb: 2 }}>
+                Shared With Me
+              </Typography>
+              <Divider />
+              {sharedEvents.map((auctionEvent) => (
+                <Link
+                  href={`/auctions/${auctionEvent._id}`}
+                  key={auctionEvent._id}
+                >
+                  <a style={{ textDecoration: "none" }}>
+                    <AuctionEventCard auctionEvent={auctionEvent} />
+                  </a>
+                </Link>
+              ))}
+            </>
+          )}
         </>
       )}
     </Layout>

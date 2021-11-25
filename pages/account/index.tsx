@@ -19,6 +19,8 @@ import {
 } from "@mui/material"
 import SquareImage from "../../components/SquareImage"
 import { useRouter } from "next/router"
+import AccountPassword from "../../components/account/AccountPassword"
+import User from "../../models/user"
 
 export default function AccountIndex() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -26,12 +28,7 @@ export default function AccountIndex() {
 
   let [errorMessage, setErrorMessage] = useState("")
   let [loading, setLoading] = useState(true)
-  let [user, setUser] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    image: "",
-  })
+  let [user, setUser] = useState<User>()
   const [selectedFile, setSelectedFile] = useState<File | null>()
   const [previewImage, setPreviewImage] = useState("")
   const [dataModified, setDataModified] = useState(false)
@@ -42,18 +39,16 @@ export default function AccountIndex() {
     axios
       .get("/api/users/current")
       .then((response) => {
-        setUser({
-          ...user,
-          name: response.data.name || "",
-          email: response.data.email || "",
-          phone: response.data.phone || "",
-          image: response.data.image || "",
-        })
+        setUser(response.data)
         setDataModified(false)
       })
-      .catch((error) => {
-        console.error(error)
-        setErrorMessage(`${error}`)
+      .catch((error: any) => {
+        console.log({ e: error })
+        try {
+          setErrorMessage(`Error: ${error.response.data.error}`)
+        } catch (e) {
+          setErrorMessage(`${error}`)
+        }
       })
       .finally(() => {
         setLoading(false)
@@ -65,10 +60,12 @@ export default function AccountIndex() {
     setErrorMessage("")
 
     const formData = new FormData()
-    formData.append("name", user.name)
-    formData.append("email", user.email)
-    formData.append("phone", user.phone)
-    formData.append("image", user.image)
+    if (user) {
+      formData.append("name", user.name)
+      formData.append("email", user.email || "")
+      formData.append("phone", user.phone || "")
+      formData.append("image", user.image || "")
+    }
 
     if (selectedFile) {
       formData.append("file", selectedFile)
@@ -77,14 +74,7 @@ export default function AccountIndex() {
     axios
       .patch("/api/users/current", formData)
       .then((response) => {
-        console.log("User Updated")
-        setUser({
-          ...user,
-          name: response.data.name || "",
-          email: response.data.email || "",
-          phone: response.data.phone || "",
-          image: response.data.image || "",
-        })
+        setUser(response.data)
         resetImage()
         setDataModified(false)
       })
@@ -102,7 +92,9 @@ export default function AccountIndex() {
   const handleChange = (
     e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void => {
-    setUser({ ...user, [e.currentTarget.name]: e.currentTarget.value })
+    let userData: any = { ...user }
+    userData[e.currentTarget.name] = e.currentTarget.value
+    setUser(userData)
     setDataModified(true)
   }
 
@@ -129,10 +121,8 @@ export default function AccountIndex() {
 
   const deleteImage = () => {
     resetImage()
-    setUser({
-      ...user,
-      image: "",
-    })
+    let userData: any = { ...user, image: "" }
+    setUser(userData)
     setDataModified(true)
   }
 
@@ -167,7 +157,7 @@ export default function AccountIndex() {
             <Card>
               <CardContent>
                 <SquareImage
-                  image={previewImage || user.image}
+                  image={previewImage || user?.image}
                   size={250}
                   rounded
                 />
@@ -186,7 +176,7 @@ export default function AccountIndex() {
                   >
                     Update Image
                   </Button>
-                  {user.image && (
+                  {user?.image && (
                     <Button
                       type="button"
                       onClick={deleteImage}
@@ -208,7 +198,7 @@ export default function AccountIndex() {
                     type="text"
                     id="name"
                     name="name"
-                    value={user.name}
+                    value={user?.name}
                     onChange={handleChange}
                   />
                 </FormControl>
@@ -218,7 +208,7 @@ export default function AccountIndex() {
                     type="email"
                     id="email"
                     name="email"
-                    value={user.email}
+                    value={user?.email}
                     onChange={handleChange}
                   />
                 </FormControl>
@@ -228,7 +218,7 @@ export default function AccountIndex() {
                     type="tel"
                     id="phone"
                     name="phone"
-                    value={user.phone}
+                    value={user?.phone}
                     onChange={handleChange}
                   />
                 </FormControl>
@@ -249,6 +239,8 @@ export default function AccountIndex() {
               </CardActions>
             </Card>
           </form>
+
+          <AccountPassword user={user} updateUser={getUser} />
 
           <Divider sx={{ mt: 6, mb: 1 }} />
           <Button

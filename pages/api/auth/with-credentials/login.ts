@@ -4,6 +4,7 @@ import getCurrentUser from "../../../../middleware/getCurrentUser"
 import connectToDB from "../../../../middleware/connectToDB"
 import logRequest from "../../../../middleware/logRequest"
 import User from "../../../../models/user"
+import bcrypt from "bcryptjs"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, logRequest)
@@ -19,6 +20,9 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
         const user = await User.findOne({ email })
         if (!user) return res.json(false)
+
+        const passwordValid = await bcrypt.compare(password, user.password)
+        if (!passwordValid) return res.json(false)
         else return res.json({ user })
       } catch (error: any) {
         return res.status(500).json({ error: `${error}` || "Error Logging In" })

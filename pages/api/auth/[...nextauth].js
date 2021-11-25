@@ -56,7 +56,9 @@ export default async function auth(req, res) {
               "/api/auth/with-credentials/login",
               credentials
             )
-            return response.data.user
+            let user = response.data.user
+            if (user) return { ...user, id: user._id }
+            else return null
           } catch (error) {
             console.error(error)
             return null

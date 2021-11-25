@@ -31,6 +31,7 @@ import LaunchIcon from "@mui/icons-material/Launch"
 import AuctionItemCard from "../../components/AuctionItemCard"
 import User from "../../models/user"
 import AuctionEvent from "../../models/AuctionEvent"
+import { signIn } from "next-auth/react"
 
 export default function EditAuctionPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -61,8 +62,12 @@ export default function EditAuctionPage() {
         setDataModified(false)
       })
       .catch((error: any) => {
-        console.error(error)
-        setErrorMessage(`${error.response.data.error}`)
+        if (error?.response?.status == 403) signIn()
+        try {
+          setErrorMessage(`Error: ${error.response.data.error}`)
+        } catch (e) {
+          setErrorMessage(`${error}`)
+        }
       })
       .finally(() => {
         setLoading(false)

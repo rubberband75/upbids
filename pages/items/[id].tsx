@@ -11,6 +11,7 @@ import { Box } from "@mui/system"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import Card from "@mui/material/Card"
 import {
+  Alert,
   Button,
   CardActions,
   CardContent,
@@ -29,6 +30,7 @@ import {
 import DownloadIcon from "@mui/icons-material/Download"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import SquareImage from "../../components/SquareImage"
+import { signIn } from "next-auth/react"
 
 export default function EditItemPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -57,8 +59,13 @@ export default function EditItemPage() {
 
       setDataModified(false)
       setQRHash(auctionItem?.lotNumber || 0)
-    } catch (error) {
-      console.error({ error })
+    } catch (error: any) {
+      if (error?.response?.status == 403) signIn()
+      try {
+        setErrorMessage(`Error: ${error.response.data.error}`)
+      } catch (e) {
+        setErrorMessage(`${error}`)
+      }
     } finally {
       setLoading(false)
     }
@@ -223,7 +230,7 @@ export default function EditItemPage() {
       </Link>
 
       {/* // Error Message */}
-      {errorMessage && <p className={"error-message"}>{errorMessage}</p>}
+      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
       {/* // Loaing Message */}
       {loading && <p>Loading...</p>}
       {/* Item Details Form */}

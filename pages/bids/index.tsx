@@ -2,13 +2,15 @@ import Layout from "../../components/layout"
 import React, { useEffect, useState, useRef } from "react"
 import Bid from "../../models/Bid"
 import axios from "axios"
-import { Divider, Typography } from "@mui/material"
+import { Alert, Divider, Typography } from "@mui/material"
+import { signIn } from "next-auth/react"
 
 export default function MyBidsPage() {
-  let [loading, setLoading] = useState(true)
-  let [activeBids, setActiveBids] = useState<Bid[]>([])
-  let [wonItems, setWonItems] = useState<Bid[]>([])
-  let [bidHistory, setBidHistory] = useState<Bid[]>([])
+  const [loading, setLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [activeBids, setActiveBids] = useState<Bid[]>([])
+  const [wonItems, setWonItems] = useState<Bid[]>([])
+  const [bidHistory, setBidHistory] = useState<Bid[]>([])
 
   const loadBids = async () => {
     setLoading(true)
@@ -17,8 +19,13 @@ export default function MyBidsPage() {
       setActiveBids(response.data.activeBids)
       setWonItems(response.data.wonItems)
       setBidHistory(response.data.bidHistory)
-    } catch (error) {
-      console.error(error)
+    } catch (error: any) {
+      if (error?.response?.status == 403) signIn()
+      try {
+        setErrorMessage(`Error: ${error.response.data.error}`)
+      } catch (e) {
+        setErrorMessage(`${error}`)
+      }
     } finally {
       setLoading(false)
     }
@@ -43,6 +50,8 @@ export default function MyBidsPage() {
         My Bids
       </Typography>
       <Divider />
+      {/* // Error Message */}
+      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
 
       <h2>Active Bids</h2>
       <hr />

@@ -1,6 +1,6 @@
 import { GetServerSideProps } from "next"
 import type { Session } from "next-auth"
-import { getSession } from "next-auth/react"
+import { signIn } from "next-auth/react"
 import Layout from "../../components/layout"
 import useSwr from "swr"
 import React, { useEffect, useState, useRef } from "react"
@@ -26,9 +26,9 @@ export default function AccountIndex() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
   const router = useRouter()
 
-  let [errorMessage, setErrorMessage] = useState("")
-  let [loading, setLoading] = useState(true)
-  let [user, setUser] = useState<User>()
+  const [errorMessage, setErrorMessage] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<User>()
   const [selectedFile, setSelectedFile] = useState<File | null>()
   const [previewImage, setPreviewImage] = useState("")
   const [dataModified, setDataModified] = useState(false)
@@ -43,7 +43,7 @@ export default function AccountIndex() {
         setDataModified(false)
       })
       .catch((error: any) => {
-        console.log({ e: error })
+        if (error?.response?.status == 403) signIn()
         try {
           setErrorMessage(`Error: ${error.response.data.error}`)
         } catch (e) {

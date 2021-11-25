@@ -28,11 +28,10 @@ const handler = async (req: any, res: NextApiResponse) => {
         if (req.file) {
           try {
             let cloudinaryImage = await uploadCoudinaryImage(req.file)
-            console.log(cloudinaryImage)
             user.image = cloudinaryImage.secure_url
           } catch (error) {
             console.error(error)
-            return res.status(500).end("Error Uploading Image")
+            return res.status(500).json({ error: "Error Uploading Image" })
           }
         }
 
@@ -41,10 +40,10 @@ const handler = async (req: any, res: NextApiResponse) => {
         break
       default:
         res.setHeader("Allow", ["GET", "PATCH"])
-        res.status(405).end(`Method ${method} Not Allowed`)
+        res.status(405).json({ error: `Method ${method} Not Allowed` })
     }
   } else {
-    res.status(403).end("No Current User")
+    res.status(403).json({ error: "No Current User" })
   }
 }
 

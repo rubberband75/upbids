@@ -20,6 +20,7 @@ import EventAvailableIcon from "@mui/icons-material/EventAvailable"
 import EventBusyIcon from "@mui/icons-material/EventBusy"
 import AuctionEventCardSkeleton from "../../components/AuctionEventCardSkeleton"
 import AuctionEventCard from "../../components/AuctionEventCard"
+import { signIn } from "next-auth/react"
 
 export default function MyAuctions() {
   let [loading, setLoading] = useState(true)
@@ -35,9 +36,13 @@ export default function MyAuctions() {
         setAuctions([...response.data.auctionEvents])
         setSharedEvents([...response.data.sharedEvents])
       })
-      .catch((error) => {
-        console.error(error)
-        setErrorMessage(`${error}`)
+      .catch((error: any) => {
+        if (error?.response?.status == 403) signIn()
+        try {
+          setErrorMessage(`Error: ${error.response.data.error}`)
+        } catch (e) {
+          setErrorMessage(`${error}`)
+        }
       })
       .finally(() => {
         setLoading(false)

@@ -8,6 +8,7 @@ interface User extends mongoose.Document {
   phone?: string
   emailVerified?: Boolean
   guestEmail?: string
+  password?: string
 }
 
 const user = new Schema<User>({
@@ -33,6 +34,10 @@ const user = new Schema<User>({
     required: false,
   },
   guestEmail: {
+    type: String,
+    required: false,
+  },
+  password: {
     type: String,
     required: false,
   },

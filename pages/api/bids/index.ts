@@ -11,7 +11,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, getCurrentUser)
 
   // Return 403 error if not logged in
-  // if (!req.user) return res.status(403).json({ error: "Must be logged in" })
+  if (!req.user) return res.status(403).json({ error: "Must be logged in" })
 
   const { method } = req
   switch (method) {

@@ -1,5 +1,5 @@
 import type { ApiRequest, ApiResponse } from "../types/api"
-import { getSession } from "next-auth/react"
+import { getToken } from "next-auth/jwt"
 import User from "../models/user"
 
 export default async function (
@@ -7,7 +7,7 @@ export default async function (
   res: ApiResponse,
   next: Function
 ) {
-  const session = await getSession({ req })
-  req.user = await User.findOne({ email: session?.user?.email })
+  const token = await getToken({ req, secret: process.env.SECRET })
+  if (token) req.user = await User.findById(token.sub)
   next(req, res)
 }

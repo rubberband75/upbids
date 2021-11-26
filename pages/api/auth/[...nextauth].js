@@ -76,5 +76,8 @@ export default async function auth(req, res) {
       }),
     ],
     secret: process.env.SECRET,
+    pages: {
+      signIn: "/auth/signin",
+    }
   })
 }

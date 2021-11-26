@@ -68,10 +68,15 @@ export default function UpBidsAppBar() {
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          UpBids
-        </Typography>
-
+        <Box sx={{ mr: 'auto' }} >
+          <Link href="/">
+            <a style={{ textDecoration: 'none' }}>
+              <Typography variant="h6" component="div" sx={{ color: "white" }}>
+                UpBids
+              </Typography>
+            </a>
+          </Link>
+        </Box>
         {!session && !loading && (
           <>
             <a

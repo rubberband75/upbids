@@ -53,7 +53,7 @@ export default async function auth(req, res) {
 
           try {
             const response = await axios.post(
-              "/api/auth/with-credentials/login",
+              `${process.env.NEXTAUTH_URL}/api/auth/with-credentials/login`,
               credentials
             )
             let user = response.data.user

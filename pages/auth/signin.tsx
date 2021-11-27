@@ -1,19 +1,21 @@
+import * as React from "react"
 import {
+  Alert,
   Button,
   Card,
   CardContent,
   Divider,
-  FormControl,
   Tab,
   Tabs,
   TextField,
-  Typography,
 } from "@mui/material"
 import { Box } from "@mui/system"
+import axios from "axios"
 import { GetServerSideProps } from "next"
-import { getCsrfToken, getProviders, signIn } from "next-auth/react"
+import { getProviders, signIn, useSession } from "next-auth/react"
 import { useState } from "react"
 import Layout from "../../components/layout"
+import { useRouter } from "next/router"
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -38,6 +40,22 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function SignIn({ providers }: { providers: any }) {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  React.useEffect(() => {
+    if (session) {
+      let callbackUrl = "/"
+      if (router.query.callbackUrl) {
+        if (typeof router.query.callbackUrl === "string")
+          callbackUrl = router.query.callbackUrl
+        else if (router.query.callbackUrl.length)
+          callbackUrl = router.query.callbackUrl[0]
+      }
+      router.replace(callbackUrl)
+    }
+  }, [router.isReady, session])
+
   const [loading, setLoading] = useState(false)
   const [tab, setTab] = useState(0)
   const [errorMessage, setErrorMessage] = useState("")
@@ -45,7 +63,7 @@ export default function SignIn({ providers }: { providers: any }) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
-  const [fullName, setFullName] = useState("")
+  const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
@@ -53,10 +71,37 @@ export default function SignIn({ providers }: { providers: any }) {
     setTab(newValue)
   }
 
-  const signUp = (e: React.FormEvent<HTMLFormElement>) => {
+  const signUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const payload = { fullName, email, phone, password, confirmPassword }
-    console.log(payload)
+    setLoading(true)
+    setErrorMessage("")
+    try {
+      let response = await axios.post("/api/auth/with-credentials/signup", {
+        name,
+        email,
+        phone,
+        password,
+        confirmPassword,
+      })
+
+      let valid = await axios.post("/api/auth/with-credentials/login", {
+        email,
+        password,
+      })
+
+      console.log({ newUser: response.data, login: valid.data })
+
+      signIn("credentials", { email, password })
+    } catch (error: any) {
+      console.log({ e: error })
+      try {
+        setErrorMessage(`Error: ${error.response.data.error}`)
+      } catch (e) {
+        setErrorMessage(`${error}`)
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -127,11 +172,13 @@ export default function SignIn({ providers }: { providers: any }) {
                   variant="contained"
                   fullWidth
                   size="large"
+                  disabled={loading}
                   sx={{ my: 1 }}
                 >
                   Sign In
                 </Button>
               </form>
+              {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
             </TabPanel>
             <TabPanel value={tab} index={1}>
               <form onSubmit={signUp}>
@@ -139,11 +186,11 @@ export default function SignIn({ providers }: { providers: any }) {
                   fullWidth
                   label="Full Name"
                   type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={fullName}
+                  id="name"
+                  name="name"
+                  value={name}
                   onChange={(e) => {
-                    setFullName(e.currentTarget.value)
+                    setName(e.currentTarget.value)
                   }}
                   sx={{ my: 1 }}
                 />
@@ -201,11 +248,13 @@ export default function SignIn({ providers }: { providers: any }) {
                   variant="contained"
                   fullWidth
                   size="large"
+                  disabled={loading}
                   sx={{ my: 1 }}
                 >
                   Sign Up
                 </Button>
               </form>
+              {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
             </TabPanel>
 
             <Divider sx={{ my: 2 }} />
@@ -234,7 +283,6 @@ export const getServerSideProps: GetServerSideProps<{ providers: any }> =
     return {
       props: {
         providers: await getProviders(),
-        csrfToken: await getCsrfToken(context),
       },
     }
   }

@@ -58,7 +58,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       // Hide manager list from managers
       if (isManager) auctionEvent.managers = undefined
 
-      return res.json({ auctionEvent, auctionItems })
+      return res.json({ auctionEvent, auctionItems, isOwner, isManager })
     case "PATCH":
       try {
         // Extract fields from req body

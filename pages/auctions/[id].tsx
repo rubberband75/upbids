@@ -39,9 +39,12 @@ export default function EditAuctionPage() {
   const router = useRouter()
   const { id } = router.query
 
-  let [loading, setLoading] = useState(true)
-  let [errorMessage, setErrorMessage] = useState("")
-  let [event, setEvent] = useState<AuctionEvent>()
+  const [loading, setLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState("")
+
+  const [event, setEvent] = useState<AuctionEvent>()
+  const [isManager, setIsManager] = useState(false)
+
   const [selectedFile, setSelectedFile] = useState<File | null>()
   const [previewImage, setPreviewImage] = useState("")
   const [dataModified, setDataModified] = useState(false)
@@ -59,6 +62,7 @@ export default function EditAuctionPage() {
       .then((response) => {
         setEvent(response.data.auctionEvent)
         setAuctionItems(response.data.auctionItems)
+        setIsManager(response.data.isManager)
         setDataModified(false)
       })
       .catch((error: any) => {
@@ -87,13 +91,6 @@ export default function EditAuctionPage() {
       if (eventData[key] !== null && eventData[key] !== undefined)
         formData.append(key, eventData[key].toString())
     }
-
-    // formData.append("bannerImage", event?.bannerImage)
-    // formData.append("title", event?.title)
-    // formData.append("description", event?.description)
-    // formData.append("slug", event?.slug)
-    // formData.append("published", event?.published.toString())
-    // formData.append("biddingOpen", event?.biddingOpen.toString())
 
     if (selectedFile) {
       formData.append("bannerImage", selectedFile)
@@ -389,75 +386,80 @@ export default function EditAuctionPage() {
             </Button>
           </Link>
 
-          <Typography variant="h5" component="h2" sx={{ mt: 6 }}>
-            Collaborators
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <i>
-            Enter the email address of the UpBids account you wish to share
-            access with, and they will be invited to see and update this event.
-          </i>
-          <form onSubmit={addCollaborator}>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                my: 1,
-              }}
-            >
-              <TextField
-                label="Email"
-                type="email"
-                id="email"
-                name="email"
-                size="small"
-                value={collaboratorEmail}
-                onChange={(e) => {
-                  setCollaboratorEmail(e.currentTarget.value)
-                }}
-                sx={{ flexGrow: 1, mr: 1 }}
-              />
-              <Button type="submit" variant="contained">
-                Invite
-              </Button>
-            </Box>
-          </form>
-
-          <Table size="small" sx={{ mt: 2 }}>
-            <TableBody>
-              {event?.managers?.map((user) => {
-                if (typeof user === "object")
-                  return (
-                    <TableRow
-                      key={user._id}
-                      sx={{
-                        "&:last-child td, &:last-child th": { border: 0 },
-                      }}
-                    >
-                      <TableCell>{user.name}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        <Button
-                          size="small"
-                          name={user.email}
-                          onClick={(e) => {
-                            if (
-                              confirm(
-                                "Are you sure you want to remove this collaborator?"
-                              )
-                            ) {
-                              deleteCollaborator(e.currentTarget.name)
-                            }
+          {!isManager && (
+            <>
+              {" "}
+              <Typography variant="h5" component="h2" sx={{ mt: 6 }}>
+                Collaborators
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              <i>
+                Enter the email address of the UpBids account you wish to share
+                access with, and they will be invited to see and update this
+                event.
+              </i>
+              <form onSubmit={addCollaborator}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    my: 1,
+                  }}
+                >
+                  <TextField
+                    label="Email"
+                    type="email"
+                    id="email"
+                    name="email"
+                    size="small"
+                    value={collaboratorEmail}
+                    onChange={(e) => {
+                      setCollaboratorEmail(e.currentTarget.value)
+                    }}
+                    sx={{ flexGrow: 1, mr: 1 }}
+                  />
+                  <Button type="submit" variant="contained">
+                    Invite
+                  </Button>
+                </Box>
+              </form>
+              <Table size="small" sx={{ mt: 2 }}>
+                <TableBody>
+                  {event?.managers?.map((user) => {
+                    if (typeof user === "object")
+                      return (
+                        <TableRow
+                          key={user._id}
+                          sx={{
+                            "&:last-child td, &:last-child th": { border: 0 },
                           }}
                         >
-                          Remove
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )
-              })}
-            </TableBody>
-          </Table>
+                          <TableCell>{user.name}</TableCell>
+                          <TableCell>{user.email}</TableCell>
+                          <TableCell>
+                            <Button
+                              size="small"
+                              name={user.email}
+                              onClick={(e) => {
+                                if (
+                                  confirm(
+                                    "Are you sure you want to remove this collaborator?"
+                                  )
+                                ) {
+                                  deleteCollaborator(e.currentTarget.name)
+                                }
+                              }}
+                            >
+                              Remove
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      )
+                  })}
+                </TableBody>
+              </Table>{" "}
+            </>
+          )}
 
           <Typography variant="h5" component="h2" sx={{ mt: 6 }}>
             Danger Zone

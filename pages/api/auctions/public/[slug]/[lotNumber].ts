@@ -49,6 +49,14 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           isTopBid: true,
         })
 
+        if (!currentBid) {
+          currentBid = await Bid.findOne({ itemId: auctionItem._id })
+            .sort({ amount: -1 })
+            .limit(1)
+
+          if (currentBid) await currentBid.update({ isTopBid: true })
+        }
+
         // Return auctionItem
         return res.json({ auctionItem, currentBid })
       } catch (error: any) {

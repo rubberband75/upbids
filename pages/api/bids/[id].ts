@@ -29,6 +29,8 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
     return res.status(500).json({ error: "Error Loading Bid" })
   }
 
+  let itemId = bid.itemId
+
   switch (method) {
     case "GET":
       return res.json({ bid })
@@ -57,6 +59,22 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
     case "DELETE":
       try {
         await bid.delete()
+
+        await Bid.updateMany(
+          { itemId },
+          {
+            $set: {
+              isTopBid: false,
+            },
+          }
+        )
+
+        let newTopBid: Bid = await Bid.findOne({ itemId })
+          .sort({ amount: -1 })
+          .limit(1)
+
+        if (newTopBid) await newTopBid.update({ isTopBid: true })
+
         return res.end(`Bid Deleted: ${id}`)
       } catch (error) {
         return res

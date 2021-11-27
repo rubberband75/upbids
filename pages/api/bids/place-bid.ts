@@ -7,6 +7,7 @@ import User from "../../../models/user"
 import AuctionItem from "../../../models/AuctionItem"
 import AuctionEvent from "../../../models/AuctionEvent"
 import logRequest from "../../../middleware/logRequest"
+import { v4 as uuidv4 } from "uuid"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, logRequest)
@@ -35,6 +36,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
             name: fullName,
             guestEmail: email,
             phone: phone,
+            email: uuidv4(),
           })
           userId = newUser._id
         }

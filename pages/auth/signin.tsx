@@ -54,6 +54,10 @@ export default function SignIn({ providers }: { providers: any }) {
       }
       router.replace(callbackUrl)
     }
+
+    if (router.query.error) {
+      setErrorMessage(`Sign In Unsuccessful`)
+    }
   }, [router.isReady, session])
 
   const [loading, setLoading] = useState(false)
@@ -69,6 +73,7 @@ export default function SignIn({ providers }: { providers: any }) {
 
   const changeTab = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue)
+    setErrorMessage("")
   }
 
   const signUp = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -7,6 +7,7 @@ import uploadCoudinaryImage from "../../../../lib/cloudinary"
 import AuctionItem from "../../../../models/AuctionItem"
 import AuctionEvent from "../../../../models/AuctionEvent"
 import logRequest from "../../../../middleware/logRequest"
+import { io } from "socket.io-client"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, logRequest)
@@ -95,6 +96,13 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         } else if (image != undefined) auctionItem.image = image
 
         auctionItem.save()
+
+        if (req.io && auctionItem._id) {
+          req.io
+            .to(auctionItem._id.toString())
+            .emit("item-update", { auctionItem })
+        }
+
         return res.json({ auctionItem })
       } catch (error: any) {
         return res

@@ -47,7 +47,7 @@ export default function AuctionEventCard({
             </Typography>
           </CardContent>
           <CardActions>
-            <Typography variant="body2">
+            <Typography variant="body2" component="div">
               {auctionEvent.published ? (
                 <Chip
                   icon={<PublicIcon />}

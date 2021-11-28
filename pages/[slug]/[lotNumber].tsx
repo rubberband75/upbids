@@ -49,42 +49,56 @@ export default function LotNumberPage() {
     phone: "",
   })
 
+  // Load item when router is ready
   useEffect(() => {
     if (!router.isReady) return
     getItem()
   }, [router.isReady])
 
+  // When item is first loaded, subscribe to socket events for this item
   useEffect(() => {
     if (itemLoaded) {
       socket.emit("join-item-room", auctionItem)
       socket.on("item-update", handleSocketItemUpdate)
+      socket.on("bid-update", handleSocketBidUpdate)
     }
     return () => {
+      // When leaving the page, unsubscribe from this item
       socket.emit("leave-item-room", auctionItem)
       socket.off("item-update", handleSocketItemUpdate)
+      socket.off("bid-update", handleSocketBidUpdate)
     }
   }, [itemLoaded])
 
+  // Reload item when update-item api call happens
   const handleSocketItemUpdate = useCallback((data: any) => {
-    console.log("Bid Page Item Update", data)
     setAuctionItem(data.auctionItem)
   }, [])
 
+  // Reload bid when place-bid api call happens
+  const handleSocketBidUpdate = useCallback((data: any) => {
+    setCurrentBid(data.bid)
+  }, [])
+
+  // Recalculate next-Minimum-Bid when the current bid is updated
+  useEffect(() => {
+    let minBid = currentBid
+      ? currentBid.amount + (auctionItem?.minimunIncrement || 0)
+      : auctionItem?.startingBid || 0
+
+    setMinNextBid(minBid)
+    setBidAmount(Math.max(minBid, bidAmount))
+  }, [currentBid])
+
+  // Load item and current bid from database
   const getItem = () => {
     setErrorMessage("")
     axios
       .get(`/api/auctions/public/${slug}/${lotNumber}`)
       .then((response) => {
-        let item = response.data.auctionItem
-        let bid = response.data.currentBid
+        setAuctionItem(response.data.auctionItem)
+        setCurrentBid(response.data.currentBid)
 
-        setAuctionItem(item)
-        setCurrentBid(bid)
-
-        let minBid = bid ? bid.amount + item.minimunIncrement : item.startingBid
-
-        setMinNextBid(minBid)
-        setBidAmount(Math.max(minBid, bidAmount))
         if (!itemLoaded) setItemLoaded(true)
       })
       .catch((error: any) => {
@@ -123,8 +137,7 @@ export default function LotNumberPage() {
         itemId: auctionItem?._id,
         amount: bidAmount,
       })
-      // window.location.reload()
-      getItem()
+      // getItem()
     } catch (error: any) {
       console.error(error)
       try {

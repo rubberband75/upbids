@@ -105,6 +105,11 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           isTopBid: true,
         })
 
+        // Push event to subscribed websockets
+        if (req.io) {
+          req.io.to(itemId.toString()).emit("bid-update", { bid })
+        }
+
         // Return Bid
         return res.json({ bid, auctionItem, oldTopBid })
       } catch (error: any) {

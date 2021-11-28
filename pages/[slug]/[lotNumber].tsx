@@ -11,11 +11,9 @@ import {
   Card,
   CardActions,
   CardContent,
-  CardHeader,
   Divider,
   FormControl,
   Grid,
-  Input,
   InputAdornment,
   OutlinedInput,
   Paper,
@@ -27,15 +25,10 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import SquareImage from "../../components/SquareImage"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
-import io from "socket.io-client"
-import { SocketContext } from "../../components/context/socket"
+import { SocketContext } from "../../sockets/SocketClient"
 
 export default function LotNumberPage() {
   const socket = useContext(SocketContext)
-
-  socket.on("broadcast", (data) => {
-    console.log({ broadcastData: data })
-  })
 
   const router = useRouter()
   const { slug, lotNumber } = router.query
@@ -45,26 +38,6 @@ export default function LotNumberPage() {
     if (!router.isReady) return
     getItem()
   }, [router.isReady])
-
-  useEffect(() => {
-    socket.emit("hello")
-  }, [socket])
-
-  // useEffect(() => {
-  //   if (!router.isReady) return
-  //   const interval = setInterval(() => {
-  //     getItem()
-  //   }, 10000)
-  //   return () => clearInterval(interval)
-  // }, [router.isReady])
-
-  // useEffect(() => {
-  //   const socket = io()
-  //   socket.on("connect", () => {
-  //     socket.emit("hello")
-  //   })
-
-  // }, [])
 
   let [loading, setLoading] = useState(true)
   let [notFound, setNotFound] = useState(false)
@@ -81,24 +54,9 @@ export default function LotNumberPage() {
     phone: "",
   })
 
-  const handleBroadcast = (data: any) => {
-    console.log({ braodcastData: data })
-  }
-
   useEffect(() => {
-    // as soon as the component is mounted, do the following tasks:
-
-    // emit USER_ONLINE event
+    console.log({ auctionItem })
     if (auctionItem.lotNumber) socket.emit("watch-item", auctionItem)
-
-    // subscribe to socket events
-    // socket.on("broadcast", handleBroadcast)
-
-    return () => {
-      // before the component is destroyed
-      // unbind all event handlers used in this component
-      // socket.off("broadcast", handleBroadcast)
-    }
   }, [auctionItem])
 
   const getItem = () => {

@@ -8,7 +8,7 @@ import CssBaseline from "@mui/material/CssBaseline"
 import theme from "../components/theme"
 import Head from "next/head"
 import "./styles.css"
-import { SocketContext, socket } from "../components/context/socket"
+import { SocketContext, socket } from "../sockets/SocketClient"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()

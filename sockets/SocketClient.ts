@@ -7,3 +7,7 @@ export const SocketContext = createContext(socket)
 socket.on("connect", () => {
   socket.emit("hello")
 })
+
+socket.on("broadcast", (data) => {
+  console.log({ broadcast: data })
+})

@@ -12,12 +12,21 @@ const createSocketServer = (server: http.Server) => {
 
     socket.on("hello", (data) => {
       console.log("client confirmed connection")
-      io.emit("broadcast", "Somone joined the party")
+      // io.emit("broadcast", "Somone joined the party")
     })
 
-    socket.on("watch-item", (auctionItem: AuctionItem) => {
-      console.log("Socket Room Joined:", auctionItem._id)
-      socket.join(auctionItem._id.toString())
+    socket.on("join-item-room", (auctionItem: AuctionItem) => {
+      if (auctionItem) {
+        console.log("Socket Room Joined:", auctionItem._id)
+        socket.join(auctionItem._id.toString())
+      }
+    })
+
+    socket.on("leave-item-room", (auctionItem: AuctionItem) => {
+      if (auctionItem) {
+        console.log("Socket Room Left:", auctionItem._id)
+        socket.leave(auctionItem._id.toString())
+      }
     })
 
     socket.on("disconnect", () => {

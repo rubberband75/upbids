@@ -2,7 +2,7 @@ import Layout from "../../components/layout"
 import axios from "axios"
 import AuctionItem from "../../models/AuctionItem"
 import Bid from "../../models/Bid"
-import { useContext, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { signIn, useSession } from "next-auth/react"
 import DefaultErrorPage from "next/error"
 import {
@@ -34,30 +34,41 @@ export default function LotNumberPage() {
   const { slug, lotNumber } = router.query
   const { data: session, status } = useSession()
 
-  useEffect(() => {
-    if (!router.isReady) return
-    getItem()
-  }, [router.isReady])
-
-  let [loading, setLoading] = useState(true)
-  let [notFound, setNotFound] = useState(false)
-  let [errorMessage, setErrorMessage] = useState("")
-  let [auctionItem, setAuctionItem] = useState<AuctionItem>(new AuctionItem())
-  let [currentBid, setCurrentBid] = useState<Bid>()
-  let [minNextBid, setMinNextBid] = useState(0)
-  let [bidAmount, setBidAmount] = useState(0)
-  let [verifyingBid, setVerifyingBid] = useState(false)
-
-  let [user, setUser] = useState({
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
+  const [itemLoaded, setItemLoaded] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [auctionItem, setAuctionItem] = useState<AuctionItem>()
+  const [currentBid, setCurrentBid] = useState<Bid>()
+  const [minNextBid, setMinNextBid] = useState(0)
+  const [bidAmount, setBidAmount] = useState(0)
+  const [verifyingBid, setVerifyingBid] = useState(false)
+  const [user, setUser] = useState({
     name: "",
     email: "",
     phone: "",
   })
 
   useEffect(() => {
-    console.log({ auctionItem })
-    if (auctionItem.lotNumber) socket.emit("watch-item", auctionItem)
-  }, [auctionItem])
+    if (!router.isReady) return
+    getItem()
+  }, [router.isReady])
+
+  useEffect(() => {
+    if (itemLoaded) {
+      socket.emit("join-item-room", auctionItem)
+      socket.on("item-update", handleSocketItemUpdate)
+    }
+    return () => {
+      socket.emit("leave-item-room", auctionItem)
+      socket.off("item-update", handleSocketItemUpdate)
+    }
+  }, [itemLoaded])
+
+  const handleSocketItemUpdate = useCallback((data: any) => {
+    console.log("Bid Page Item Update", data)
+    setAuctionItem(data.auctionItem)
+  }, [])
 
   const getItem = () => {
     setErrorMessage("")
@@ -74,6 +85,7 @@ export default function LotNumberPage() {
 
         setMinNextBid(minBid)
         setBidAmount(Math.max(minBid, bidAmount))
+        if (!itemLoaded) setItemLoaded(true)
       })
       .catch((error: any) => {
         console.error({ error })
@@ -154,7 +166,7 @@ export default function LotNumberPage() {
   return (
     <Layout>
       {loading && <Skeleton />}
-      {!loading && !!auctionItem.lotNumber && (
+      {!loading && auctionItem && (
         <>
           <Link href={`/${slug}`}>
             <a style={{ textDecoration: "none" }}>
@@ -333,9 +345,7 @@ export default function LotNumberPage() {
           </Paper>
         </>
       )}
-      {!loading && (notFound || !auctionItem.lotNumber) && (
-        <DefaultErrorPage statusCode={404} />
-      )}
+      {!loading && notFound && <DefaultErrorPage statusCode={404} />}
     </Layout>
   )
 }

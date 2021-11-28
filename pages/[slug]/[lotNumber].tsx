@@ -157,9 +157,11 @@ export default function LotNumberPage() {
       {!loading && !!auctionItem.lotNumber && (
         <>
           <Link href={`/${slug}`}>
-            <Button sx={{ my: 0 }} variant="text" startIcon={<ArrowBackIcon />}>
-              All Items
-            </Button>
+            <a style={{ textDecoration: "none" }}>
+              <Button variant="text" startIcon={<ArrowBackIcon />}>
+                All Items
+              </Button>
+            </a>
           </Link>
           <Grid container spacing={2} alignItems="center">
             <Grid item>

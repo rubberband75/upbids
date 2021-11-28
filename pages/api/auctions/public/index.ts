@@ -16,7 +16,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
             published: true,
             slug: { $ne: "" },
           },
-          "-userId -_id -__v"
+          "-userId -__v"
         )
         res.json(auctionEvents)
       } catch (error) {

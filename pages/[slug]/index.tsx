@@ -8,12 +8,9 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import DefaultErrorPage from "next/error"
 import {
-  CardActionArea,
-  CardActions,
   CardContent,
   CardMedia,
   Divider,
-  Grid,
   Paper,
   Skeleton,
   Typography,

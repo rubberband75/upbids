@@ -26,6 +26,7 @@ import { useRouter } from "next/router"
 import SquareImage from "../../components/SquareImage"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import { SocketContext } from "../../sockets/SocketClient"
+import AuctionEvent from "../../models/AuctionEvent"
 
 export default function LotNumberPage() {
   const socket = useContext(SocketContext)
@@ -38,6 +39,7 @@ export default function LotNumberPage() {
   const [notFound, setNotFound] = useState(false)
   const [itemLoaded, setItemLoaded] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
+  const [auctionEvent, setAuctionEvent] = useState<AuctionEvent>()
   const [auctionItem, setAuctionItem] = useState<AuctionItem>()
   const [currentBid, setCurrentBid] = useState<Bid>()
   const [minNextBid, setMinNextBid] = useState(0)
@@ -58,17 +60,26 @@ export default function LotNumberPage() {
   // When item is first loaded, subscribe to socket events for this item
   useEffect(() => {
     if (itemLoaded) {
+      socket.emit("join-event-room", auctionEvent)
       socket.emit("join-item-room", auctionItem)
+      socket.on("event-update", handleSocketEventUpdate)
       socket.on("item-update", handleSocketItemUpdate)
       socket.on("bid-update", handleSocketBidUpdate)
     }
     return () => {
       // When leaving the page, unsubscribe from this item
+      socket.emit("leave-event-room", auctionEvent)
       socket.emit("leave-item-room", auctionItem)
+      socket.off("event-update", handleSocketEventUpdate)
       socket.off("item-update", handleSocketItemUpdate)
       socket.off("bid-update", handleSocketBidUpdate)
     }
   }, [itemLoaded])
+
+  // Reload event when update-event api call happens
+  const handleSocketEventUpdate = useCallback((data: any) => {
+    setAuctionEvent(data.auctionEvent)
+  }, [])
 
   // Reload item when update-item api call happens
   const handleSocketItemUpdate = useCallback((data: any) => {
@@ -96,6 +107,7 @@ export default function LotNumberPage() {
     axios
       .get(`/api/auctions/public/${slug}/${lotNumber}`)
       .then((response) => {
+        setAuctionEvent(response.data.auctionEvent)
         setAuctionItem(response.data.auctionItem)
         setCurrentBid(response.data.currentBid)
 
@@ -231,9 +243,8 @@ export default function LotNumberPage() {
                 : currencyFormatter.format(Number(auctionItem.startingBid))}
             </Typography>
 
-            {typeof auctionItem.eventId === "object" &&
-            !auctionItem.eventId.biddingOpen ? (
-              <i>Bidding Not Yet Open</i>
+            {auctionEvent?.biddingOpen === false ? (
+              <i>Bidding Not Open</i>
             ) : (
               <>
                 <label htmlFor="bid">

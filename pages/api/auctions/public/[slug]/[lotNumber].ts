@@ -38,7 +38,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           eventId: auctionEvent._id,
           published: true,
           lotNumber: lotNumber,
-        }).populate({ path: "eventId", select: "-description -userId " })
+        })
 
         // Throw 404 if no public item found with this lot number
         if (!auctionItem)
@@ -58,7 +58,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         }
 
         // Return auctionItem
-        return res.json({ auctionItem, currentBid })
+        return res.json({ auctionItem, currentBid, auctionEvent })
       } catch (error: any) {
         return res.status(500).json({ error: "Error Loading Item" })
       }

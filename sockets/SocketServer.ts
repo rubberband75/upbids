@@ -29,6 +29,20 @@ const createSocketServer = (server: http.Server) => {
       }
     })
 
+    socket.on("join-event-room", (auctionEvent: AuctionItem) => {
+      if (auctionEvent) {
+        console.log("Socket Room Joined:", auctionEvent._id)
+        socket.join(auctionEvent._id.toString())
+      }
+    })
+
+    socket.on("leave-event-room", (auctionEvent: AuctionItem) => {
+      if (auctionEvent) {
+        console.log("Socket Room Left:", auctionEvent._id)
+        socket.leave(auctionEvent._id.toString())
+      }
+    })
+
     socket.on("disconnect", () => {
       console.log("client disconnected")
     })

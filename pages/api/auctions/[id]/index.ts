@@ -94,6 +94,15 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
         // Save and return event object
         await auctionEvent.save()
+
+        // Push socket.io event to room: auctionEvent._id
+        if (req.io && auctionEvent._id) {
+          req.io
+            .to(auctionEvent._id.toString())
+            .emit("event-update", { auctionEvent })
+        }
+
+        // Return JSON
         return res.json({ auctionEvent })
       } catch (error) {
         // Thow 500 error if any uncaught errors occure

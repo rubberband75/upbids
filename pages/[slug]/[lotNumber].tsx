@@ -45,6 +45,7 @@ export default function LotNumberPage() {
   const [minNextBid, setMinNextBid] = useState(0)
   const [bidAmount, setBidAmount] = useState(0)
   const [verifyingBid, setVerifyingBid] = useState(false)
+  const [highestBidder, setHighestBidder] = useState(false)
   const [user, setUser] = useState({
     name: "",
     email: "",
@@ -99,7 +100,15 @@ export default function LotNumberPage() {
 
     setMinNextBid(minBid)
     setBidAmount(Math.max(minBid, bidAmount))
-  }, [currentBid])
+
+    setHighestBidder(
+      !!(
+        currentBid &&
+        session &&
+        currentBid?.userId.toString() === session?.user?._id?.toString()
+      )
+    )
+  }, [currentBid, session])
 
   // Load item and current bid from database
   const getItem = () => {
@@ -265,6 +274,7 @@ export default function LotNumberPage() {
                     startAdornment={
                       <InputAdornment position="start">$</InputAdornment>
                     }
+                    disabled={verifyingBid || highestBidder}
                   />
                 </FormControl>
                 {session && (
@@ -273,10 +283,36 @@ export default function LotNumberPage() {
                       variant="contained"
                       size="large"
                       onClick={placeBid}
-                      disabled={bidAmount < minNextBid || verifyingBid}
+                      disabled={
+                        bidAmount < minNextBid || verifyingBid || highestBidder
+                      }
                     >
                       Place Bid
                     </Button>
+
+                    {currentBid &&
+                      session &&
+                      currentBid?.userId.toString() ===
+                        session?.user?._id?.toString() && (
+                        <Alert
+                          sx={{ mt: 3 }}
+                          action={
+                            highestBidder && (
+                              <Button
+                                color="inherit"
+                                size="small"
+                                onClick={() => {
+                                  setHighestBidder(false)
+                                }}
+                              >
+                                Bid Again?
+                              </Button>
+                            )
+                          }
+                        >
+                          You are the highest bidder!
+                        </Alert>
+                      )}
                   </FormControl>
                 )}
                 {!session && (

@@ -78,6 +78,13 @@ export default async function auth(req, res) {
     secret: process.env.SECRET,
     pages: {
       signIn: "/auth/signin",
-    }
+    },
+    callbacks: {
+      async session({ session, token, user }) {
+        // Send properties to the client
+        session.user._id = token.sub
+        return session
+      },
+    },
   })
 }

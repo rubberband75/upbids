@@ -72,8 +72,25 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         let newTopBid: Bid = await Bid.findOne({ itemId })
           .sort({ amount: -1 })
           .limit(1)
+          .populate({
+            path: "itemId",
+            select: "-description",
+            populate: { path: "eventId", select: "-description -userId " },
+          })
 
-        if (newTopBid) await newTopBid.update({ isTopBid: true })
+        if (newTopBid) {
+          console.log(newTopBid)
+
+          let won = false
+          if (
+            typeof newTopBid.itemId === "object" &&
+            typeof newTopBid.itemId.eventId === "object"
+          ) {
+            won = !newTopBid.itemId.eventId.biddingOpen
+          }
+
+          await newTopBid.update({ isTopBid: true, won })
+        }
 
         return res.end(`Bid Deleted: ${id}`)
       } catch (error) {

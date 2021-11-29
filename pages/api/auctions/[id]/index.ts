@@ -7,6 +7,7 @@ import uploadCoudinaryImage from "../../../../lib/cloudinary"
 import connectToDB from "../../../../middleware/connectToDB"
 import getCurrentUser from "../../../../middleware/getCurrentUser"
 import logRequest from "../../../../middleware/logRequest"
+import Bid from "../../../../models/Bid"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, logRequest)
@@ -65,6 +66,9 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         let { title, description, slug, published, biddingOpen, bannerImage } =
           req.body || {}
 
+        // Save old biddingOpen state
+        let oldBiddingState = auctionEvent.biddingOpen
+
         // Check for duplicate slugs
         if (slug && slug != auctionEvent.slug) {
           let existingSlug = await AuctionEvent.findOne({ slug })
@@ -100,6 +104,54 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           req.io
             .to(auctionEvent._id.toString())
             .emit("event-update", { auctionEvent })
+        }
+
+        // If the event switched from bidding Open to Closed
+        if (
+          oldBiddingState !== auctionEvent.biddingOpen &&
+          !auctionEvent.biddingOpen
+        ) {
+          // Find all items
+          let items = await AuctionItem.find({ eventId: auctionEvent._id })
+          for (let i = 0; i < items.length; i++) {
+            // Set each bid as NOT topBid or won
+            await Bid.updateMany(
+              { itemId: items[i]._id },
+              {
+                $set: {
+                  isTopBid: false,
+                  won: false,
+                },
+              }
+            )
+
+            // Find the winning Bid
+            let winningBid = await Bid.findOne({ itemId: items[i]._id })
+              .sort({ amount: -1 })
+              .limit(1)
+
+            // Set only winnning bid as topBid and won
+            if (winningBid)
+              await winningBid.update({ isTopBid: true, won: true })
+          }
+        }
+        // If the event swithced from Closed to Open
+        else if (
+          oldBiddingState !== auctionEvent.biddingOpen &&
+          auctionEvent.biddingOpen
+        ) {
+          let items = await AuctionItem.find({ eventId: auctionEvent._id })
+          for (let i = 0; i < items.length; i++) {
+            // Set each bid as NOT topBid or won
+            await Bid.updateMany(
+              { itemId: items[i]._id },
+              {
+                $set: {
+                  won: false,
+                },
+              }
+            )
+          }
         }
 
         // Return JSON

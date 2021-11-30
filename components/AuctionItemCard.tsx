@@ -35,10 +35,10 @@ export default function AuctionItemCard({
   useEffect(() => {
     getCurrentBid()
 
-    socket.emit("join-item-room", auctionItem)
+    socket.emit("join-room", auctionItem._id)
     socket.on("bid-update", handleSocketBidUpdate)
     return () => {
-      socket.emit("leave-item-room", auctionItem)
+      socket.emit("leave-room", auctionItem._id)
       socket.off("bid-update", handleSocketBidUpdate)
     }
   }, [])

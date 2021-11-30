@@ -15,32 +15,14 @@ const createSocketServer = (server: http.Server) => {
       // io.emit("broadcast", "Somone joined the party")
     })
 
-    socket.on("join-item-room", (auctionItem: AuctionItem) => {
-      if (auctionItem) {
-        console.log("Socket Room Joined:", auctionItem._id)
-        socket.join(auctionItem._id.toString())
-      }
+    socket.on("join-room", (roomId: string | undefined | null) => {
+      console.log("+", roomId)
+      if (roomId) socket.join(roomId)
     })
 
-    socket.on("leave-item-room", (auctionItem: AuctionItem) => {
-      if (auctionItem) {
-        console.log("Socket Room Left:", auctionItem._id)
-        socket.leave(auctionItem._id.toString())
-      }
-    })
-
-    socket.on("join-event-room", (auctionEvent: AuctionItem) => {
-      if (auctionEvent) {
-        console.log("Socket Room Joined:", auctionEvent._id)
-        socket.join(auctionEvent._id.toString())
-      }
-    })
-
-    socket.on("leave-event-room", (auctionEvent: AuctionItem) => {
-      if (auctionEvent) {
-        console.log("Socket Room Left:", auctionEvent._id)
-        socket.leave(auctionEvent._id.toString())
-      }
+    socket.on("leave-room", (roomId: string | undefined | null) => {
+      console.log("-", roomId)
+      if (roomId) socket.join(roomId)
     })
 
     socket.on("disconnect", () => {

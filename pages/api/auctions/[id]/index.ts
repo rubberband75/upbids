@@ -133,6 +133,13 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
             // Set only winnning bid as topBid and won
             if (winningBid)
               await winningBid.update({ isTopBid: true, won: true })
+
+            // Push socket event
+            if (req.io) {
+              req.io
+                .to(items[i]._id.toString())
+                .emit("item-update", { auctionItem: items[i] })
+            }
           }
         }
         // If the event swithced from Closed to Open

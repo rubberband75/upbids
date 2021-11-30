@@ -61,16 +61,16 @@ export default function LotNumberPage() {
   // When item is first loaded, subscribe to socket events for this item
   useEffect(() => {
     if (itemLoaded) {
-      socket.emit("join-event-room", auctionEvent)
-      socket.emit("join-item-room", auctionItem)
+      socket.emit("join-room", auctionEvent?._id)
+      socket.emit("join-room", auctionItem?._id)
       socket.on("event-update", handleSocketEventUpdate)
       socket.on("item-update", handleSocketItemUpdate)
       socket.on("bid-update", handleSocketBidUpdate)
     }
     return () => {
       // When leaving the page, unsubscribe from this item
-      socket.emit("leave-event-room", auctionEvent)
-      socket.emit("leave-item-room", auctionItem)
+      socket.emit("leave-room", auctionEvent?._id)
+      socket.emit("leave-room", auctionItem?._id)
       socket.off("event-update", handleSocketEventUpdate)
       socket.off("item-update", handleSocketItemUpdate)
       socket.off("bid-update", handleSocketBidUpdate)

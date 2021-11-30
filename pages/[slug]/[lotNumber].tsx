@@ -267,6 +267,10 @@ export default function LotNumberPage() {
                     id="bid"
                     type="number"
                     name="bid"
+                    inputProps={{
+                      step: (auctionItem?.minimunIncrement || 0).toString(),
+                      min: minNextBid,
+                    }}
                     value={bidAmount || ""}
                     onChange={(e) => {
                       setBidAmount(

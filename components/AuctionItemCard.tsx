@@ -11,9 +11,10 @@ import {
 import AuctionItem from "../models/AuctionItem"
 import SquareImage from "./SquareImage"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import Bid from "../models/Bid"
 import axios from "axios"
+import { SocketContext } from "../sockets/SocketClient"
 
 export default function AuctionItemCard({
   auctionItem,
@@ -28,10 +29,18 @@ export default function AuctionItemCard({
   alertSeverity?: AlertColor
   bid?: Bid
 }) {
+  const socket = useContext(SocketContext)
   const [currentBid, setCurrentBid] = useState<Bid | undefined | null>()
 
   useEffect(() => {
     getCurrentBid()
+
+    socket.emit("join-item-room", auctionItem)
+    socket.on("bid-update", handleSocketBidUpdate)
+    return () => {
+      socket.emit("leave-item-room", auctionItem)
+      socket.off("bid-update", handleSocketBidUpdate)
+    }
   }, [])
 
   const getCurrentBid = async () => {
@@ -44,6 +53,13 @@ export default function AuctionItemCard({
       console.log(error)
     }
   }
+
+  const handleSocketBidUpdate = useCallback((data: any) => {
+    let updatedBid: Bid = data.bid
+    if (updatedBid.itemId === auctionItem._id) {
+      setCurrentBid(updatedBid)
+    }
+  }, [])
 
   const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",

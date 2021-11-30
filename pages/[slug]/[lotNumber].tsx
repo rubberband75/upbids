@@ -267,9 +267,13 @@ export default function LotNumberPage() {
                     id="bid"
                     type="number"
                     name="bid"
-                    value={bidAmount}
+                    value={bidAmount || ""}
                     onChange={(e) => {
-                      setBidAmount(Number(e.currentTarget.value))
+                      setBidAmount(
+                        Number(
+                          Number.parseFloat(e.currentTarget.value).toFixed(2)
+                        )
+                      )
                     }}
                     startAdornment={
                       <InputAdornment position="start">$</InputAdornment>

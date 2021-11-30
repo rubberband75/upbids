@@ -13,6 +13,7 @@ import SquareImage from "./SquareImage"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import Bid from "../models/Bid"
+import axios from "axios"
 
 export default function AuctionItemCard({
   auctionItem,
@@ -27,9 +28,22 @@ export default function AuctionItemCard({
   alertSeverity?: AlertColor
   bid?: Bid
 }) {
-  const [currentBid, setCurrentBid] = useState<Bid>()
+  const [currentBid, setCurrentBid] = useState<Bid | undefined | null>()
 
-  useEffect(() => {})
+  useEffect(() => {
+    getCurrentBid()
+  }, [])
+
+  const getCurrentBid = async () => {
+    try {
+      let response = await axios.get(
+        `/api/items/${auctionItem._id}/current-bid`
+      )
+      setCurrentBid(response.data.currentBid)
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",

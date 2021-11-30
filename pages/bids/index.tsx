@@ -2,8 +2,16 @@ import Layout from "../../components/layout"
 import React, { useEffect, useState, useRef } from "react"
 import Bid from "../../models/Bid"
 import axios from "axios"
-import { Alert, Divider, Typography } from "@mui/material"
+import {
+  Alert,
+  Card,
+  CardContent,
+  Divider,
+  Link,
+  Typography,
+} from "@mui/material"
 import { signIn } from "next-auth/react"
+import AuctionItemCard from "../../components/AuctionItemCard"
 
 export default function MyBidsPage() {
   const [loading, setLoading] = useState(true)
@@ -57,25 +65,21 @@ export default function MyBidsPage() {
       <hr />
       {loading && <i style={{ color: "grey" }}>Loading...</i>}
       {!loading && !activeBids.length && <i style={{ color: "grey" }}>None</i>}
-      {activeBids.map(({ _id, amount, isTopBid, itemId }) => {
-        if (typeof itemId === "object" && typeof itemId.eventId == "object") {
+      {activeBids.map((bid: Bid) => {
+        if (
+          typeof bid.itemId === "object" &&
+          typeof bid.itemId.eventId == "object"
+        ) {
           return (
-            <a
-              href={`/${itemId.eventId.slug}/${itemId.lotNumber}`}
-              className={"text-decoration-none"}
-              key={_id}
-            >
-              <div className={"card"}>
-                <small>{itemId.eventId.title}</small> <br />
-                <b>
-                  Lot #{itemId.lotNumber?.toString().padStart(3, "0")} -{" "}
-                  {itemId.title}
-                </b>
-                <br />
-                {currencyFormatter.format(amount)} <br />
-                <i>{isTopBid ? "You're the Top Bid!" : "Outbid"}</i>
-              </div>
-            </a>
+            <AuctionItemCard
+              key={bid._id}
+              auctionItem={bid.itemId}
+              href={`/${bid.itemId.eventId.slug}/${bid.itemId.lotNumber}`}
+              alertMessage={
+                bid.isTopBid ? "You're the Top Bid!" : "You've Been Outbid"
+              }
+              alertSeverity={bid.isTopBid ? "success" : "warning"}
+            />
           )
         }
       })}
@@ -86,18 +90,13 @@ export default function MyBidsPage() {
       <hr />
       {loading && <i style={{ color: "grey" }}>Loading...</i>}
       {!loading && !wonItems.length && <i style={{ color: "grey" }}>None</i>}
-      {wonItems.map(({ _id, amount, itemId }) => {
-        if (typeof itemId === "object" && typeof itemId.eventId == "object") {
+      {wonItems.map((bid) => {
+        if (
+          typeof bid.itemId === "object" &&
+          typeof bid.itemId.eventId == "object"
+        ) {
           return (
-            <div key={_id} className={"card"}>
-              <small>{itemId.eventId.title}</small> <br />
-              <b>
-                Lot #{itemId.lotNumber?.toString().padStart(3, "0")} -{" "}
-                {itemId.title}
-              </b>
-              <br />
-              {currencyFormatter.format(amount)} <br />
-            </div>
+            <AuctionItemCard key={bid._id} auctionItem={bid.itemId} bid={bid} />
           )
         }
       })}

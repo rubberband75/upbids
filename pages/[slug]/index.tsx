@@ -81,17 +81,11 @@ export default function AuctionPage() {
           </Typography>
           <Divider />
           {auctionItems.map((auctionItem: AuctionItem) => (
-            <Link
+            <AuctionItemCard
               href={`/${slug}/${auctionItem.lotNumber}`}
+              auctionItem={auctionItem}
               key={auctionItem._id}
-            >
-              <a style={{ textDecoration: "none" }}>
-                <AuctionItemCard
-                  auctionItem={auctionItem}
-                  key={auctionItem._id}
-                />
-              </a>
-            </Link>
+            />
           ))}
         </>
       )}

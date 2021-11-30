@@ -26,7 +26,6 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
         // If not logged in, create new user
         if (!userId) {
-          console.log({ fullName, email, phone })
           if (!fullName || !email || !phone) {
             return res
               .status(400)

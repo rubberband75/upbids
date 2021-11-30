@@ -21,6 +21,6 @@ nextApp.prepare().then(async () => {
   app.all("*", (req: any, res: any) => nextHandler(req, res))
 
   server.listen(port, () => {
-    console.log(`\n * Listening at http://localhost:${port}\n`)
+    console.info(`\n * Listening at http://localhost:${port}\n`)
   })
 })

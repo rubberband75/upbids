@@ -9,5 +9,5 @@ socket.on("connect", () => {
 })
 
 socket.on("broadcast", (data) => {
-  console.log({ broadcast: data })
+  console.info({ broadcast: data })
 })

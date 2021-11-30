@@ -38,7 +38,6 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
     case "PATCH":
       try {
         // Extract fields from req body
-        console.log({ body: req.body })
         let { amount, isTopBid, won, notified, paid } = req.body || {}
 
         // TODO: Check for equal/greter bid amounts on same item
@@ -79,8 +78,6 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           })
 
         if (newTopBid) {
-          console.log(newTopBid)
-
           let won = false
           if (
             typeof newTopBid.itemId === "object" &&

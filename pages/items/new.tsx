@@ -82,7 +82,7 @@ export default function EditItemPage() {
       // Redirect to new item
       router.push(`/items/${response.data.auctionItem._id}`)
     } catch (error: any) {
-      console.log({ error })
+      console.error({ error })
       try {
         setErrorMessage(`Error: ${error.response.data.error}`)
       } catch (e) {

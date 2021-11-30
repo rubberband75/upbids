@@ -94,11 +94,9 @@ export default function SignIn({ providers }: { providers: any }) {
         password,
       })
 
-      console.log({ newUser: response.data, login: valid.data })
-
       signIn("credentials", { email, password })
     } catch (error: any) {
-      console.log({ e: error })
+      console.error({ e: error })
       try {
         setErrorMessage(`Error: ${error.response.data.error}`)
       } catch (e) {

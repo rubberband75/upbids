@@ -7,26 +7,18 @@ const createSocketServer = (server: http.Server) => {
   io.attach(server)
 
   io.on("connection", (socket: socketio.Socket) => {
-    console.log("connection")
-    socket.emit("status", "Hello from Socket.io")
-
-    socket.on("hello", (data) => {
-      console.log("client confirmed connection")
-      // io.emit("broadcast", "Somone joined the party")
-    })
+    // console.info("socket - connected")
 
     socket.on("join-room", (roomId: string | undefined | null) => {
-      console.log("+", roomId)
       if (roomId) socket.join(roomId)
     })
 
     socket.on("leave-room", (roomId: string | undefined | null) => {
-      console.log("-", roomId)
       if (roomId) socket.join(roomId)
     })
 
     socket.on("disconnect", () => {
-      console.log("client disconnected")
+      console.info("socket - disconnected")
     })
   })
 

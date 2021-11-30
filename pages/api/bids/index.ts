@@ -61,7 +61,6 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       return res.json({ activeBids, wonItems, bidHistory: bids })
     case "POST":
       // Extract fields from req body
-      console.log({ body: req.body })
       let { userId, itemId, amount } = req.body || {}
 
       // Default to current user ID if none provided

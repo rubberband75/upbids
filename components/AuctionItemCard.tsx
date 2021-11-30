@@ -50,7 +50,7 @@ export default function AuctionItemCard({
       )
       setCurrentBid(response.data.currentBid)
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 

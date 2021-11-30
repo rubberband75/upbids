@@ -1,32 +1,31 @@
 import Layout from "../../components/layout"
-import React, { useEffect, useState, useRef } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import Bid from "../../models/Bid"
 import axios from "axios"
-import {
-  Alert,
-  Card,
-  CardContent,
-  Divider,
-  Link,
-  Typography,
-} from "@mui/material"
+import { Alert, Divider, Typography } from "@mui/material"
 import { signIn } from "next-auth/react"
 import AuctionItemCard from "../../components/AuctionItemCard"
+import { SocketContext } from "../../sockets/SocketClient"
 
 export default function MyBidsPage() {
+  const socket = useContext(SocketContext)
+
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState("")
   const [activeBids, setActiveBids] = useState<Bid[]>([])
   const [wonItems, setWonItems] = useState<Bid[]>([])
   const [bidHistory, setBidHistory] = useState<Bid[]>([])
 
+  const [joinedRooms, setJoinedRooms] = useState<string[]>([])
+
   const loadBids = async () => {
-    setLoading(true)
+    // setLoading(true)
     try {
       let response = await axios.get("/api/bids")
       setActiveBids(response.data.activeBids)
       setWonItems(response.data.wonItems)
       setBidHistory(response.data.bidHistory)
+      joinNewRooms()
     } catch (error: any) {
       if (error?.response?.status == 403) signIn()
       try {
@@ -39,7 +38,52 @@ export default function MyBidsPage() {
     }
   }
 
+  const joinNewRooms = () => {
+    let rooms: Set<string> = new Set()
+    bidHistory.forEach((bid) => {
+      if (
+        typeof bid.itemId === "object" &&
+        typeof bid.itemId.eventId == "object"
+      ) {
+        rooms.add(bid.itemId._id)
+        rooms.add(bid.itemId.eventId._id)
+      }
+    })
+
+    rooms.forEach((room) => {
+      socket.emit("join-room", room)
+    })
+  }
+
   useEffect(() => {
+    loadBids()
+    socket.on("event-update", handleSocketUpdate)
+    socket.on("item-update", handleSocketUpdate)
+    socket.on("bid-update", handleSocketUpdate)
+
+    return () => {
+      let rooms: Set<string> = new Set()
+      bidHistory.forEach((bid) => {
+        if (
+          typeof bid.itemId === "object" &&
+          typeof bid.itemId.eventId == "object"
+        ) {
+          rooms.add(bid.itemId._id)
+          rooms.add(bid.itemId.eventId._id)
+        }
+      })
+
+      rooms.forEach((room) => {
+        socket.emit("leave-room", room)
+      })
+
+      socket.off("event-update", handleSocketUpdate)
+      socket.off("item-update", handleSocketUpdate)
+      socket.off("bid-update", handleSocketUpdate)
+    }
+  }, [])
+
+  const handleSocketUpdate = useCallback((data: any) => {
     loadBids()
   }, [])
 

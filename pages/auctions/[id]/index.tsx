@@ -1,9 +1,9 @@
-import Layout from "../../components/layout"
+import Layout from "../../../components/layout"
 import { useRouter } from "next/router"
 import React, { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import Link from "next/link"
-import AuctionItem from "../../models/AuctionItem"
+import AuctionItem from "../../../models/AuctionItem"
 import Card from "@mui/material/Card"
 import {
   Button,
@@ -28,9 +28,9 @@ import {
 } from "@mui/material"
 import { Box } from "@mui/system"
 import LaunchIcon from "@mui/icons-material/Launch"
-import AuctionItemCard from "../../components/AuctionItemCard"
-import User from "../../models/user"
-import AuctionEvent from "../../models/AuctionEvent"
+import AuctionItemCard from "../../../components/AuctionItemCard"
+import User from "../../../models/user"
+import AuctionEvent from "../../../models/AuctionEvent"
 import { signIn } from "next-auth/react"
 
 export default function EditAuctionPage() {
@@ -363,6 +363,14 @@ export default function EditAuctionPage() {
               </CardActions>
             </Card>
           </form>
+
+          <Link href={`/auctions/${id}/dashboard`}>
+            <a style={{ textDecoration: "none" }}>
+              <Button fullWidth size="large" variant="contained" sx={{ my: 2 }}>
+                Auction Dashboard
+              </Button>
+            </a>
+          </Link>
 
           <Typography variant="h5" component="h2" sx={{ mt: 6 }}>
             Auction Items

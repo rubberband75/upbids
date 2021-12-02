@@ -15,6 +15,7 @@ import AuctionEvent from "../../../models/AuctionEvent"
 import AuctionItem from "../../../models/AuctionItem"
 import AuctionItemTableRow from "../../../components/AuctionItemTableRow"
 import Layout from "../../../components/layout"
+import { Box } from "@mui/system"
 
 export default function AuctionDashboard() {
   const router = useRouter()
@@ -23,9 +24,13 @@ export default function AuctionDashboard() {
   const [auctionEvent, setEvent] = useState<AuctionEvent>()
   const [auctionItems, setAuctionItems] = useState<AuctionItem[]>([])
 
+  const [totalBid, setTotalBid] = useState(0)
+  const [totalPaid, setTotalPaid] = useState(0)
+
   useEffect(() => {
     if (!router.isReady) return
     getEvent()
+    getMetrics()
   }, [router.isReady])
 
   const getEvent = async () => {
@@ -34,15 +39,46 @@ export default function AuctionDashboard() {
     setAuctionItems(response.data.auctionItems)
   }
 
+  const getMetrics = async () => {
+    let response = await axios.get(`/api/auctions/${id}/metrics`)
+    setTotalBid(response.data.totalBid)
+    setTotalPaid(response.data.totalPaid)
+  }
+
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+
   return (
     <Layout fullWidth>
-      <Typography
-        variant="h4"
-        component="h1"
-        sx={{ m: 2, display: "inline-block" }}
-      >
-        {auctionEvent?.title}
-      </Typography>
+      <Box sx={{ m: 2, display: "flex", flexDirection: "column" }}>
+        <Typography variant="h3" component="h1">
+          {auctionEvent?.title}
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box sx={{ m: 2, display: "flex", flexDirection: "column" }}>
+            Total Bid:
+            <Typography variant="h4" component="h2">
+              {currencyFormatter.format(totalBid)}
+            </Typography>
+          </Box>
+          <Box sx={{ m: 2, display: "flex", flexDirection: "column" }}>
+            Total Paid:
+            <Typography variant="h6" component="h2" color="grey">
+              {currencyFormatter.format(totalPaid)}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">

@@ -10,14 +10,17 @@ import {
 } from "@mui/material"
 import axios from "axios"
 import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import AuctionEvent from "../../../models/AuctionEvent"
 import AuctionItem from "../../../models/AuctionItem"
 import AuctionItemTableRow from "../../../components/AuctionItemTableRow"
 import Layout from "../../../components/layout"
 import { Box } from "@mui/system"
+import { SocketContext } from "../../../sockets/SocketClient"
+import Link from "next/link"
 
 export default function AuctionDashboard() {
+  const socket = useContext(SocketContext)
   const router = useRouter()
   const { id } = router.query
 
@@ -34,16 +37,38 @@ export default function AuctionDashboard() {
   }, [router.isReady])
 
   const getEvent = async () => {
-    let response = await axios.get(`/api/auctions/${id}`)
-    setEvent(response.data.auctionEvent)
-    setAuctionItems(response.data.auctionItems)
+    try {
+      let response = await axios.get(`/api/auctions/${id}`)
+      setEvent(response.data.auctionEvent)
+      setAuctionItems(response.data.auctionItems)
+    } catch (e) {}
   }
 
   const getMetrics = async () => {
-    let response = await axios.get(`/api/auctions/${id}/metrics`)
-    setTotalBid(response.data.totalBid)
-    setTotalPaid(response.data.totalPaid)
+    try {
+      let response = await axios.get(`/api/auctions/${id}/metrics`)
+      setTotalBid(response.data.totalBid)
+      setTotalPaid(response.data.totalPaid)
+    } catch (e) {}
   }
+
+  useEffect(() => {
+    socket.on("event-update", handleSocketUpdate)
+    socket.on("item-update", handleSocketUpdate)
+    socket.on("bid-update", handleSocketUpdate)
+
+    return () => {
+      socket.off("event-update", handleSocketUpdate)
+      socket.off("item-update", handleSocketUpdate)
+      socket.off("bid-update", handleSocketUpdate)
+    }
+  }, [])
+
+  const handleSocketUpdate = useCallback((data: any) => {
+    console.log(data)
+    getMetrics()
+    getEvent()
+  }, [])
 
   const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -55,25 +80,36 @@ export default function AuctionDashboard() {
   return (
     <Layout fullWidth>
       <Box sx={{ m: 2, display: "flex", flexDirection: "column" }}>
-        <Typography variant="h3" component="h1">
-          {auctionEvent?.title}
-        </Typography>
+        <Link href={`/auctions/${id}`}>
+          <a style={{ textDecoration: "none", color: "unset" }}>
+            <Typography variant="h3" component="h1">
+              {auctionEvent?.title}
+            </Typography>
+          </a>
+        </Link>
         <Box
           sx={{
             display: "flex",
             flexDirection: "row",
-            justifyContent: "space-between",
+            alignItems: "flex-end",
           }}
         >
-          <Box sx={{ m: 2, display: "flex", flexDirection: "column" }}>
+          <Box sx={{ m: 2, mr: 6, display: "flex", flexDirection: "column" }}>
             Total Bid:
             <Typography variant="h4" component="h2">
               {currencyFormatter.format(totalBid)}
             </Typography>
           </Box>
-          <Box sx={{ m: 2, display: "flex", flexDirection: "column" }}>
+          <Box
+            sx={{
+              m: 2,
+              display: "flex",
+              flexDirection: "column",
+              color: "#666666",
+            }}
+          >
             Total Paid:
-            <Typography variant="h6" component="h2" color="grey">
+            <Typography variant="h6" component="h2">
               {currencyFormatter.format(totalPaid)}
             </Typography>
           </Box>

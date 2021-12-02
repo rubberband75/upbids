@@ -35,23 +35,33 @@ export default function AuctionItemTableRow({
         `/api/items/${auctionItem._id}/current-bid`
       )
       setCurrentBid(response.data.currentBid)
-
-      let userId = response.data.currentBid?.userId
-
-      if (userId) {
-        let userResponse = await axios.get(`/api/users/${userId}`)
-        let userData = userResponse.data
-        setUser(userData)
-      }
+      getUser(response.data.currentBid)
     } catch (error) {
       console.error(error)
     }
   }
 
+  const getUser = async (bid: Bid | null | undefined) => {
+    let userId = bid?.userId
+
+    if (userId) {
+      let userResponse = await axios.get(`/api/users/${userId}`)
+      let userData = userResponse.data
+      setUser(userData)
+    } else {
+      setUser(undefined)
+    }
+  }
+
   const handleSocketBidUpdate = useCallback((data: any) => {
     let updatedBid: Bid = data.bid
-    if (updatedBid.itemId === auctionItem._id) {
+    if (
+      updatedBid &&
+      updatedBid.itemId === auctionItem._id &&
+      updatedBid.isTopBid
+    ) {
       setCurrentBid(updatedBid)
+      getUser(updatedBid)
     }
   }, [])
 

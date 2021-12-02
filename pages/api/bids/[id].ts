@@ -5,6 +5,7 @@ import connectToDB from "../../../middleware/connectToDB"
 import AuctionItem from "../../../models/AuctionItem"
 import Bid from "../../../models/Bid"
 import logRequest from "../../../middleware/logRequest"
+import { socket } from "../../../sockets/SocketClient"
 
 const handler = async (req: ApiRequest, res: ApiResponse) => {
   await runMiddleware(req, res, logRequest)
@@ -92,6 +93,15 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           }
 
           await newTopBid.update({ isTopBid: true, won })
+
+          if (req.io) {
+            let socketData: any = newTopBid
+            socketData.itemId = itemId.toString()
+            socketData.isTopBid = true
+            req.io.to(itemId.toString()).emit("bid-update", {
+              bid: socketData,
+            })
+          }
         }
 
         return res.end(`Bid Deleted: ${id}`)

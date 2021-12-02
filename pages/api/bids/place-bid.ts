@@ -21,11 +21,8 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         // Extract fields from req body
         let { userId, itemId, amount, fullName, email, phone } = req.body || {}
 
-        // Default to current user ID if none provided
-        if (!userId) userId = req.user?._id
-
-        // If not logged in, create new user
-        if (!userId) {
+        // If no userId provided, but guest data provided, creat guest account bid
+        if (!userId && (fullName || email || phone)) {
           if (!fullName || !email || !phone) {
             return res
               .status(400)
@@ -40,6 +37,9 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           userId = newUser._id
         }
 
+        // Default to current user ID if none provided
+        if (!userId) userId = req.user?._id
+
         // Check for equal/greter bid amounts on same item
         let auctionItem = await AuctionItem.findOne({
           _id: itemId,
@@ -49,10 +49,19 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         }
 
         let auctionEvent: AuctionEvent = auctionItem.eventId
+
+        let isOwner = `${auctionEvent.userId}` === `${req.user._id}`
+        let isManager = auctionEvent.managers?.some((user) => {
+          if (typeof user === "object")
+            return `${user._id}` == `${req.user._id}`
+          else return `${user}` != `${req.user._id}`
+        })
+
         if (
-          !auctionEvent.biddingOpen ||
-          !auctionEvent.published ||
-          !auctionItem.published
+          !(isOwner || isManager) &&
+          (!auctionEvent.biddingOpen ||
+            !auctionEvent.published ||
+            !auctionItem.published)
         ) {
           return res
             .status(400)

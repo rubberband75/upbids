@@ -74,9 +74,15 @@ export default function AuctionItemTableRow({
       <TableCell align="left">
         {currentBid?.amount ? currencyFormatter.format(currentBid?.amount) : ""}
       </TableCell>
-      <TableCell align="left">{user?.name}</TableCell>
-      <TableCell align="left">{user?.guestEmail || user?.email}</TableCell>
-      <TableCell align="left">{user?.phone}</TableCell>
+      <TableCell align="left">
+        <div>
+          <b>{user?.name}&nbsp;</b>
+          <br />
+          {user?.guestEmail || user?.email}&nbsp;
+          <br />
+          {user?.phone}&nbsp;
+        </div>
+      </TableCell>
       <TableCell align="left">{currentBid?.paid ? "X" : ""}</TableCell>
       <TableCell align="center">
         <ManualBid auctionItem={auctionItem} currentBid={currentBid} />

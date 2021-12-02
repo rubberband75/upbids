@@ -51,8 +51,6 @@ export default function AuctionDashboard() {
               <TableCell>Item</TableCell>
               <TableCell>Amount</TableCell>
               <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Phone</TableCell>
               <TableCell>Paid</TableCell>
               <TableCell align="center">Add Bid</TableCell>
             </TableRow>

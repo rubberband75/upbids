@@ -9,21 +9,22 @@ import DialogTitle from "@mui/material/DialogTitle"
 import AuctionItem from "../models/AuctionItem"
 import Bid from "../models/Bid"
 import { Alert, Divider, InputAdornment, OutlinedInput } from "@mui/material"
+import axios from "axios"
 
 export default function FormDialog({
   auctionItem,
   currentBid,
 }: {
   auctionItem: AuctionItem
-  currentBid?: Bid
+  currentBid?: Bid | null | undefined
 }) {
   const [open, setOpen] = useState(false)
   const [minNextBid, setMinNextBid] = useState(0)
   const [bidAmount, setBidAmount] = useState(0)
-  const [verifyingBid, setVerifyingBid] = useState(false)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
+  const [verifyingBid, setVerifyingBid] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
   const handleClickOpen = () => {
@@ -42,6 +43,30 @@ export default function FormDialog({
     setMinNextBid(minBid)
     setBidAmount(Math.max(minBid, bidAmount))
   }, [currentBid])
+
+  const createBid = async () => {
+    setErrorMessage("")
+    setVerifyingBid(true)
+    try {
+      await axios.post("/api/bids/place-bid", {
+        itemId: auctionItem?._id,
+        amount: bidAmount,
+        fullName: name,
+        email: email,
+        phone: phone,
+      })
+      handleClose()
+    } catch (error: any) {
+      console.error(error)
+      try {
+        setErrorMessage(`Error: ${error.response.data.error}`)
+      } catch (e) {
+        setErrorMessage(`${error}`)
+      }
+    } finally {
+      setVerifyingBid(false)
+    }
+  }
 
   return (
     <div>
@@ -74,7 +99,7 @@ export default function FormDialog({
           <Divider sx={{ my: 3 }} />
 
           <TextField
-            label="Full Name *"
+            label="Full Name"
             type="text"
             id="name"
             name="name"
@@ -117,8 +142,12 @@ export default function FormDialog({
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Place Bid</Button>
+          <Button onClick={handleClose} disabled={verifyingBid}>
+            Cancel
+          </Button>
+          <Button onClick={createBid} disabled={verifyingBid}>
+            Place Bid
+          </Button>
         </DialogActions>
       </Dialog>
     </div>

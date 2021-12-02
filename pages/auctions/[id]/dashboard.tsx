@@ -39,7 +39,7 @@ export default function AuctionDashboard() {
       <Typography
         variant="h4"
         component="h1"
-        sx={{ my: 2, display: "inline-block" }}
+        sx={{ m: 2, display: "inline-block" }}
       >
         {auctionEvent?.title}
       </Typography>

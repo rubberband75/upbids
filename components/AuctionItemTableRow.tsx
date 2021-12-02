@@ -6,6 +6,7 @@ import Bid from "../models/Bid"
 import axios from "axios"
 import { SocketContext } from "../sockets/SocketClient"
 import User from "../models/user"
+import ManualBid from "./ManualBid"
 
 export default function AuctionItemTableRow({
   auctionItem,
@@ -66,7 +67,7 @@ export default function AuctionItemTableRow({
         {auctionItem.lotNumber}
       </TableCell>
       <TableCell align="left">
-        <Link href={`asdf`}>
+        <Link href={`/items/${auctionItem._id}`}>
           <a>{auctionItem.title}</a>
         </Link>
       </TableCell>
@@ -77,6 +78,9 @@ export default function AuctionItemTableRow({
       <TableCell align="left">{user?.guestEmail || user?.email}</TableCell>
       <TableCell align="left">{user?.phone}</TableCell>
       <TableCell align="left">{currentBid?.paid ? "X" : ""}</TableCell>
+      <TableCell align="center">
+        <ManualBid auctionItem={auctionItem} currentBid={currentBid} />
+      </TableCell>
     </TableRow>
   )
 }

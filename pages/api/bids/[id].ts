@@ -49,6 +49,11 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         if (paid != undefined) bid.paid = paid
 
         bid.save()
+
+        if (req.io) {
+          req.io.to(bid.itemId.toString()).emit("bid-update", { bid })
+        }
+
         return res.json({ bid })
       } catch (error: any) {
         return res

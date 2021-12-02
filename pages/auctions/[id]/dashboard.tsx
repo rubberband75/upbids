@@ -47,11 +47,11 @@ export default function AuctionDashboard() {
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>Lot</TableCell>
-              <TableCell>Item</TableCell>
-              <TableCell>Amount</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Paid</TableCell>
+              <TableCell align="center">Lot</TableCell>
+              <TableCell align="left">Item</TableCell>
+              <TableCell align="left">Name</TableCell>
+              <TableCell align="right">Amount</TableCell>
+              <TableCell align="center">Paid</TableCell>
               <TableCell align="center">Add Bid</TableCell>
             </TableRow>
           </TableHead>

@@ -1,4 +1,4 @@
-import { TableCell, TableRow } from "@mui/material"
+import { Button, TableCell, TableRow } from "@mui/material"
 import AuctionItem from "../models/AuctionItem"
 import Link from "next/link"
 import { useCallback, useContext, useEffect, useState } from "react"
@@ -7,6 +7,7 @@ import axios from "axios"
 import { SocketContext } from "../sockets/SocketClient"
 import User from "../models/user"
 import ManualBid from "./ManualBid"
+import ItemPaidToggle from "./ItemPaidToggle"
 
 export default function AuctionItemTableRow({
   auctionItem,
@@ -63,16 +64,15 @@ export default function AuctionItemTableRow({
 
   return (
     <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-      <TableCell component="th" scope="row">
+      <TableCell align="center" component="th" scope="row">
         {auctionItem.lotNumber}
       </TableCell>
       <TableCell align="left">
         <Link href={`/items/${auctionItem._id}`}>
-          <a>{auctionItem.title}</a>
+          <a style={{ textDecoration: "none" }}>
+            <Button>{auctionItem.title}</Button>
+          </a>
         </Link>
-      </TableCell>
-      <TableCell align="left">
-        {currentBid?.amount ? currencyFormatter.format(currentBid?.amount) : ""}
       </TableCell>
       <TableCell align="left">
         <div>
@@ -83,7 +83,12 @@ export default function AuctionItemTableRow({
           {user?.phone}&nbsp;
         </div>
       </TableCell>
-      <TableCell align="left">{currentBid?.paid ? "X" : ""}</TableCell>
+      <TableCell align="right">
+        {currentBid?.amount ? currencyFormatter.format(currentBid?.amount) : ""}
+      </TableCell>
+      <TableCell align="center">
+        <ItemPaidToggle bid={currentBid} />
+      </TableCell>
       <TableCell align="center">
         <ManualBid auctionItem={auctionItem} currentBid={currentBid} />
       </TableCell>

@@ -14,6 +14,7 @@ import { useEffect, useState } from "react"
 import AuctionEvent from "../../../models/AuctionEvent"
 import AuctionItem from "../../../models/AuctionItem"
 import AuctionItemTableRow from "../../../components/AuctionItemTableRow"
+import Layout from "../../../components/layout"
 
 export default function AuctionDashboard() {
   const router = useRouter()
@@ -34,7 +35,7 @@ export default function AuctionDashboard() {
   }
 
   return (
-    <>
+    <Layout fullWidth>
       <Typography
         variant="h4"
         component="h1"
@@ -65,6 +66,6 @@ export default function AuctionDashboard() {
           </TableBody>
         </Table>
       </TableContainer>
-    </>
+    </Layout>
   )
 }

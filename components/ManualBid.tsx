@@ -71,7 +71,7 @@ export default function FormDialog({
   return (
     <div>
       <Button variant="outlined" onClick={handleClickOpen}>
-        Add New Bid
+        Add Bid
       </Button>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Bid</DialogTitle>

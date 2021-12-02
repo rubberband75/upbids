@@ -5,9 +5,10 @@ import { Box } from "@mui/system"
 
 interface LayoutProps {
   children: React.ReactNode
+  fullWidth?: boolean
 }
 
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children, fullWidth }: LayoutProps) {
   return (
     <>
       <Box
@@ -19,19 +20,34 @@ export default function Layout({ children }: LayoutProps) {
       >
         <UpBidsAppBar />
 
-        <Container
-          component="main"
-          sx={{
-            mt: 8,
-            mb: 10,
-            display: "flex",
-            flexDirection: "column",
-            flexGrow: 1,
-          }}
-          maxWidth="sm"
-        >
-          {children}
-        </Container>
+        {fullWidth ? (
+          <Box
+            component="main"
+            sx={{
+              mt: 8,
+              mb: 10,
+              display: "flex",
+              flexDirection: "column",
+              flexGrow: 1,
+            }}
+          >
+            {children}
+          </Box>
+        ) : (
+          <Container
+            component="main"
+            sx={{
+              mt: 8,
+              mb: 10,
+              display: "flex",
+              flexDirection: "column",
+              flexGrow: 1,
+            }}
+            maxWidth="sm"
+          >
+            {children}
+          </Container>
+        )}
         <UpBidsFooter />
       </Box>
     </>

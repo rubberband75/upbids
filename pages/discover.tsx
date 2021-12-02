@@ -83,7 +83,7 @@ export default function DiscoverPage() {
                           />
                         )}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" noWrap>
                         {auction.description}
                       </Typography>
                     </CardContent>

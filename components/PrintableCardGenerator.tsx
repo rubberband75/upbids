@@ -52,19 +52,19 @@ export default function PrintableCardGenerator({
     setLoading(true)
     setErrorMessage("")
     try {
-      // let response = await axios.get(
-      //   `/api/auctions/${auctionEvent?._id}/printable-cards`
-      // )
-      // console.log({ response })
+      let response = await axios.post(
+        `/api/auctions/${auctionEvent?._id}/printable-cards`
+      )
       const link = document.createElement("a")
-      link.href = `/api/auctions/${auctionEvent?._id}/printable-cards`
+      link.href = response.data.url
 
       link.setAttribute("download", `${auctionEvent?.title}.pdf`) //or any other extension
       document.body.appendChild(link)
       link.click()
-      // setTimeout(function () {
-      //   document.body.removeChild(link)
-      // }, 200)
+      handleClose()
+      setTimeout(function () {
+        document.body.removeChild(link)
+      }, 200)
     } catch (error: any) {
       try {
         setErrorMessage(`${error.response.data.error}`)

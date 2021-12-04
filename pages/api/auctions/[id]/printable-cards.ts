@@ -10,7 +10,6 @@ import fs from "fs"
 import PDFDocument from "pdfkit"
 import QRCode from "qrcode"
 import axios from "axios"
-import { Writable } from "stream"
 
 const fetchImage = async (src: string) => {
   const image = await axios.get(src, {
@@ -60,13 +59,18 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       .json({ error: "You do not have permission to view this event" })
 
   switch (method) {
-    case "GET":
+    case "POST":
       let auctionItems: AuctionItem[] = await AuctionItem.find({
         eventId: auctionEvent._id,
         published: true,
       }).sort("lotNumber")
 
-      let dir = path.join(process.cwd(), "uploads", auctionEvent._id.toString())
+      let dir = path.join(
+        process.cwd(),
+        "public",
+        "generated",
+        auctionEvent._id.toString()
+      )
       fs.mkdirSync(dir, { recursive: true })
 
       // Set PDF Settings
@@ -79,8 +83,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
       // Create a document
       const doc = new PDFDocument(pageConfig)
-      let buffers: any[] = []
-      doc.on("data", buffers.push.bind(buffers))
+      doc.pipe(fs.createWriteStream(path.join(dir, "cards.pdf")))
 
       for (let i = 0; i < auctionItems.length; i++) {
         let item = auctionItems[i]
@@ -138,19 +141,16 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       }
 
       doc.on("end", () => {
-        let pdfData = Buffer.concat(buffers)
-        console.log(pdfData)
-
-        // ... now send pdfData as attachment ...
-        res.setHeader("Content-Type", "application/pdf")
-        res.write(pdfData)
-        return res.end()
+        return res.json({
+          url: `/generated/${auctionEvent._id}/cards.pdf`,
+        })
       })
-      doc.end()
 
+      doc.end()
       break
+
     default:
-      res.setHeader("Allow", ["GET"])
+      res.setHeader("Allow", ["POST"])
       res.status(405).end(`Method ${method} Not Allowed`)
   }
 }

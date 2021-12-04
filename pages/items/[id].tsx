@@ -435,7 +435,7 @@ export default function EditItemPage() {
               { _id, timestamp, amount, won, isTopBid, paid, userId },
               index
             ) => {
-              if (typeof userId === "object") {
+              if (userId && typeof userId === "object") {
                 return (
                   <tr key={_id}>
                     <td
@@ -446,7 +446,7 @@ export default function EditItemPage() {
                           .join("<br />"),
                       }}
                     ></td>
-                    <td>{userId.name}</td>
+                    <td>{userId?.name}</td>
                     <td>{currencyFormatter.format(amount)}</td>
                     <td>
                       {_id && (

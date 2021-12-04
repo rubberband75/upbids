@@ -19,56 +19,14 @@ const fetchImage = async (src: string) => {
   return image.data
 }
 
-const handler = async (req: ApiRequest, res: ApiResponse) => {
-  await runMiddleware(req, res, logRequest)
-  await runMiddleware(req, res, connectToDB)
-  await runMiddleware(req, res, getCurrentUser)
-
-  // Get object id and request method
-  const {
-    query: { id },
-    method,
-  } = req
-
-  // Return 403 error if not logged in
-  if (!req.user) return res.status(403).json({ error: "Must be logged in" })
-
-  // Load AuctionEvent
-  let auctionEvent: AuctionEvent
-  try {
-    auctionEvent = await AuctionEvent.findOne({ _id: id }).populate(
-      "managers",
-      "_id name email"
-    )
-    if (!auctionEvent)
-      return res.status(404).json({ error: "Auction Not Found" })
-  } catch (error) {
-    return res.status(500).json({ error: "Error Loading Auction" })
-  }
-
-  // Check if current user is owner or manager of event
-  let isOwner = `${auctionEvent.userId}` === `${req.user._id}`
-  let isManager = auctionEvent.managers?.some((user) => {
-    if (typeof user === "object") return `${user._id}` == `${req.user._id}`
-    else return `${user}` != `${req.user._id}`
-  })
-
-  // Check that Event is owned or managed by current user
-  if (!(isOwner || isManager))
-    return res
-      .status(403)
-      .json({ error: "You do not have permission to view this event" })
-
-  switch (method) {
-    case "POST":
-      await runMiddleware(req, res, multer().single("bannerImage"))
-      let { noImage } = req.body || {}
-
-      let auctionItems: AuctionItem[] = await AuctionItem.find({
-        eventId: auctionEvent._id,
-        published: true,
-      }).sort("lotNumber")
-
+const generatePDF = (
+  auctionEvent: AuctionEvent,
+  auctionItems: AuctionItem[],
+  logoImageBuffer: Buffer | null | undefined,
+  noImage: Boolean
+) => {
+  return new Promise(async (resolve, reject) => {
+    try {
       let dir = path.join(
         process.cwd(),
         "public",
@@ -82,9 +40,9 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       let pageConfig = { size: pageSize, margin: 5 }
 
       let logo: any
-      if (req.file && noImage !== "true") {
-        logo = req.file.buffer
-      } else if (auctionEvent.bannerImage && noImage !== "true")
+      if (logoImageBuffer && !noImage) {
+        logo = logoImageBuffer
+      } else if (auctionEvent.bannerImage && !noImage)
         logo = await fetchImage(auctionEvent.bannerImage)
 
       // Create a document
@@ -149,14 +107,79 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       }
 
       doc.on("end", () => {
-        return res.json({
-          url: `/generated/${auctionEvent._id}/cards.pdf`,
-        })
+        resolve(true)
       })
 
       doc.end()
-      break
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
 
+const handler = async (req: ApiRequest, res: ApiResponse) => {
+  await runMiddleware(req, res, logRequest)
+  await runMiddleware(req, res, connectToDB)
+  await runMiddleware(req, res, getCurrentUser)
+
+  // Get object id and request method
+  const {
+    query: { id },
+    method,
+  } = req
+
+  // Return 403 error if not logged in
+  if (!req.user) return res.status(403).json({ error: "Must be logged in" })
+
+  // Load AuctionEvent
+  let auctionEvent: AuctionEvent
+  try {
+    auctionEvent = await AuctionEvent.findOne({ _id: id }).populate(
+      "managers",
+      "_id name email"
+    )
+    if (!auctionEvent)
+      return res.status(404).json({ error: "Auction Not Found" })
+  } catch (error) {
+    return res.status(500).json({ error: "Error Loading Auction" })
+  }
+
+  // Check if current user is owner or manager of event
+  let isOwner = `${auctionEvent.userId}` === `${req.user._id}`
+  let isManager = auctionEvent.managers?.some((user) => {
+    if (typeof user === "object") return `${user._id}` == `${req.user._id}`
+    else return `${user}` != `${req.user._id}`
+  })
+
+  // Check that Event is owned or managed by current user
+  if (!(isOwner || isManager))
+    return res
+      .status(403)
+      .json({ error: "You do not have permission to view this event" })
+
+  switch (method) {
+    case "POST":
+      try {
+        await runMiddleware(req, res, multer().single("bannerImage"))
+
+        let auctionItems: AuctionItem[] = await AuctionItem.find({
+          eventId: auctionEvent._id,
+          published: true,
+        }).sort("lotNumber")
+
+        await generatePDF(
+          auctionEvent,
+          auctionItems,
+          req.file ? req.file?.buffer : null,
+          req.body.noImage === "true"
+        )
+
+        return res.json({
+          url: `/generated/${auctionEvent._id}/cards.pdf`,
+        })
+      } catch (error) {
+        return res.status(500).json({ error: "Error Loading Auction" })
+      }
     default:
       res.setHeader("Allow", ["POST"])
       res.status(405).end(`Method ${method} Not Allowed`)

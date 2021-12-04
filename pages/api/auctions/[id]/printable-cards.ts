@@ -35,6 +35,8 @@ const generatePDF = (
       )
       fs.mkdirSync(dir, { recursive: true })
 
+      console.log("Creating Folder:", dir)
+
       // Set PDF Settings
       let pageSize = [612 / 2, 792 / 2]
       let pageConfig = { size: pageSize, margin: 5 }
@@ -45,14 +47,20 @@ const generatePDF = (
       } else if (auctionEvent.bannerImage && !noImage)
         logo = await fetchImage(auctionEvent.bannerImage)
 
+      console.log("Logo Image:", logo)
+
       // Create a document
       const doc = new PDFDocument(pageConfig)
       doc.pipe(fs.createWriteStream(path.join(dir, "cards.pdf")))
+
+      console.log("Creating Write Stream to:", path.join(dir, "cards.pdf"))
 
       for (let i = 0; i < auctionItems.length; i++) {
         let item = auctionItems[i]
 
         // QR Code
+
+        console.log("QR Code for lot:", item.lotNumber)
         let itemURL = `${process.env.NEXTAUTH_URL}/${auctionEvent.slug}/${item.lotNumber}`
         let dataURL = await QRCode.toDataURL(itemURL, {
           errorCorrectionLevel: "M",
@@ -103,13 +111,18 @@ const generatePDF = (
           .moveTo(0, pageSize[1] / 2)
           .lineTo(pageSize[0], pageSize[1] / 2)
           .stroke()
+
         if (i < auctionItems.length - 1) doc.addPage(pageConfig)
+
+        console.log("Adding Page")
       }
 
       doc.on("end", () => {
+        console.log("Document ended")
         resolve(true)
       })
 
+      console.log("Ending Document")
       doc.end()
     } catch (error) {
       reject(error)
@@ -162,10 +175,14 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       try {
         await runMiddleware(req, res, multer().single("bannerImage"))
 
+        console.log("Getting Items")
+
         let auctionItems: AuctionItem[] = await AuctionItem.find({
           eventId: auctionEvent._id,
           published: true,
         }).sort("lotNumber")
+
+        console.log("Prepping Document")
 
         await generatePDF(
           auctionEvent,
@@ -174,6 +191,7 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
           req.body.noImage === "true"
         )
 
+        console.log("Returning Response")
         return res.json({
           url: `/generated/${auctionEvent._id}/cards.pdf`,
         })

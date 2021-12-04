@@ -15,6 +15,7 @@ import {
   CardMedia,
   Divider,
   InputAdornment,
+  LinearProgress,
   OutlinedInput,
   Typography,
 } from "@mui/material"
@@ -29,26 +30,49 @@ export default function PrintableCardGenerator({
   auctionEvent?: AuctionEvent
   auctionItems?: AuctionItem[]
 }) {
-  const router = useRouter()
-
   const [open, setOpen] = useState(false)
 
   const [selectedFile, setSelectedFile] = useState<File | null>()
   const [previewImage, setPreviewImage] = useState("")
 
+  let [loading, setLoading] = useState(false)
+  let [errorMessage, setErrorMessage] = useState("")
+
   const handleClickOpen = () => {
     setOpen(true)
+    setErrorMessage("")
   }
 
   const handleClose = () => {
     setOpen(false)
+    setLoading(false)
   }
 
-  useEffect(() => {
-    if (!router.isReady) return
-    console.log({ router })
-    console.log({ window })
-  }, [router.isReady])
+  const loadPDF = async () => {
+    setLoading(true)
+    setErrorMessage("")
+    try {
+      let response = await axios.get(
+        `/api/auctions/${auctionEvent?._id}/printable-cards`
+      )
+      const link = document.createElement("a")
+      link.href = response.data.url
+      link.setAttribute("download", `${auctionEvent?.title}.pdf`) //or any other extension
+      document.body.appendChild(link)
+      link.click()
+      setTimeout(function () {
+        document.body.removeChild(link)
+      }, 200)
+    } catch (error: any) {
+      try {
+        setErrorMessage(`${error.response.data.error}`)
+      } catch (e) {
+        setErrorMessage(`${error}`)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div>
@@ -119,13 +143,15 @@ export default function PrintableCardGenerator({
           </Card>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} disabled={false}>
+          <Button onClick={handleClose} disabled={loading}>
             Cancel
           </Button>
-          <Button variant="contained" onClick={handleClose} disabled={false}>
+          <Button variant="contained" onClick={loadPDF} disabled={loading}>
             Create PDF
           </Button>
         </DialogActions>
+        {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+        {loading && <LinearProgress />}
       </Dialog>
     </div>
   )

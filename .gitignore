@@ -116,5 +116,5 @@ package-lock.json
 # PM2 Config
 ecosystem.config.js
 
-# Uploaded files for Printable QR Code cards
-uploads/ 
+# Generated files for Printable QR Code cards
+public/generated/

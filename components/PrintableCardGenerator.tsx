@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Button from "@mui/material/Button"
 import TextField from "@mui/material/TextField"
 import Dialog from "@mui/material/Dialog"
@@ -34,26 +34,36 @@ export default function PrintableCardGenerator({
 
   const [selectedFile, setSelectedFile] = useState<File | null>()
   const [previewImage, setPreviewImage] = useState("")
+  const [noImage, setNoImage] = useState(false)
 
-  let [loading, setLoading] = useState(false)
-  let [errorMessage, setErrorMessage] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+
+  const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
 
   const handleClickOpen = () => {
     setOpen(true)
     setErrorMessage("")
+    resetImage()
   }
 
   const handleClose = () => {
     setOpen(false)
-    setLoading(false)
   }
 
   const loadPDF = async () => {
     setLoading(true)
     setErrorMessage("")
     try {
+      const formData = new FormData()
+      formData.append("noImage", noImage.toString())
+      if (selectedFile && !noImage) {
+        formData.append("bannerImage", selectedFile)
+      }
+
       let response = await axios.post(
-        `/api/auctions/${auctionEvent?._id}/printable-cards`
+        `/api/auctions/${auctionEvent?._id}/printable-cards`,
+        formData
       )
       const link = document.createElement("a")
       link.href = response.data.url
@@ -76,6 +86,32 @@ export default function PrintableCardGenerator({
     }
   }
 
+  const updateImage = (e: React.FormEvent<HTMLInputElement>): void => {
+    resetImage()
+    let fileList: FileList | null = (e.target as HTMLInputElement).files
+    if (fileList && fileList[0]) {
+      let file = fileList[0]
+      setSelectedFile(file)
+
+      let reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = (r) => {
+        let loadedImage = r.target?.result || ""
+        setPreviewImage(`${loadedImage}`)
+      }
+    }
+  }
+
+  const removeImage = () => {
+    setNoImage(true)
+  }
+
+  const resetImage = () => {
+    setSelectedFile(null)
+    setPreviewImage("")
+    setNoImage(false)
+  }
+
   return (
     <div>
       <Button variant="text" onClick={handleClickOpen}>
@@ -91,26 +127,28 @@ export default function PrintableCardGenerator({
                 display: "flex",
                 flexDirection: "column",
                 width: "100%",
-                aspectRatio: "8.5/5.5",
+                aspectRatio: "510/330",
+                p: 1,
               }}
             >
-              <CardMedia
-                component="img"
-                sx={{
-                  width: "14em",
-                  height: "5em",
-                  mx: "auto",
-                }}
-                image={previewImage || auctionEvent?.bannerImage}
-              />
+              <div
+                style={{ display: "block", height: "5em", margin: "0 auto" }}
+              >
+                {(previewImage || auctionEvent?.bannerImage) && !noImage && (
+                  <img
+                    src={previewImage || auctionEvent?.bannerImage}
+                    style={{ height: "4.5em" }}
+                  />
+                )}
+              </div>
               {auctionItems && auctionItems.length >= 1 && (
                 <>
-                  <Box display="flex" flexDirection="row" sx={{ mt: 1 }}>
+                  <Box display="flex" flexDirection="row" sx={{ mt: 0 }}>
                     <img
                       src={`/api/items/${auctionItems[0]._id}/qr`}
-                      style={{ width: "13em", height: "13em" }}
+                      style={{ width: "12em", height: "12em" }}
                     />
-                    <Box sx={{ mt: 3 }}>
+                    <Box sx={{ mt: 2 }}>
                       <Typography display="block" gutterBottom>
                         LOT #
                         {auctionItems[0].lotNumber?.toString().padStart(3, "0")}
@@ -118,7 +156,7 @@ export default function PrintableCardGenerator({
                       <Typography
                         display="block"
                         gutterBottom
-                        sx={{ fontSize: "21pt", lineHeight: "1" }}
+                        sx={{ fontSize: "21pt", lineHeight: "1", my: 1.5 }}
                       >
                         {auctionItems[0].title}
                       </Typography>
@@ -135,7 +173,7 @@ export default function PrintableCardGenerator({
                   </Box>
                   <Typography
                     display="block"
-                    sx={{ ml: 2, mt: 1, fontSize: "10pt" }}
+                    sx={{ ml: 2, my: 1, fontSize: "10pt" }}
                   >
                     {`${window.origin}/${auctionEvent?.slug}/${auctionItems[0].lotNumber}`}
                   </Typography>
@@ -143,6 +181,23 @@ export default function PrintableCardGenerator({
               )}
             </Box>
           </Card>
+
+          <Box sx={{ my: 1 }}>
+            <input
+              hidden
+              type="file"
+              accept="image/*"
+              ref={imageInputRef}
+              onChange={updateImage}
+            />
+            <Button
+              variant="outlined"
+              onClick={() => imageInputRef.current.click()}
+            >
+              Change Image
+            </Button>
+            <Button onClick={removeImage}>Remove Image</Button>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} disabled={loading}>

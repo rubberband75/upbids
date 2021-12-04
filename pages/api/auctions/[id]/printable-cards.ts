@@ -10,6 +10,7 @@ import fs from "fs"
 import PDFDocument from "pdfkit"
 import QRCode from "qrcode"
 import axios from "axios"
+import multer from "multer"
 
 const fetchImage = async (src: string) => {
   const image = await axios.get(src, {
@@ -60,6 +61,9 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
   switch (method) {
     case "POST":
+      await runMiddleware(req, res, multer().single("bannerImage"))
+      let { noImage } = req.body || {}
+
       let auctionItems: AuctionItem[] = await AuctionItem.find({
         eventId: auctionEvent._id,
         published: true,
@@ -78,7 +82,9 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
       let pageConfig = { size: pageSize, margin: 5 }
 
       let logo: any
-      if (auctionEvent.bannerImage)
+      if (req.file && noImage !== "true") {
+        logo = req.file.buffer
+      } else if (auctionEvent.bannerImage && noImage !== "true")
         logo = await fetchImage(auctionEvent.bannerImage)
 
       // Create a document
@@ -87,12 +93,6 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
 
       for (let i = 0; i < auctionItems.length; i++) {
         let item = auctionItems[i]
-
-        // Logo Image
-        if (logo)
-          doc.image(logo, pageSize[0] / 2 - 50, pageSize[1] / 2, {
-            fit: [100, 100],
-          })
 
         // QR Code
         let itemURL = `${process.env.NEXTAUTH_URL}/${auctionEvent.slug}/${item.lotNumber}`
@@ -103,6 +103,14 @@ const handler = async (req: ApiRequest, res: ApiResponse) => {
         doc.image(dataURL, 0, pageSize[1] * 0.61, {
           fit: [pageSize[1] * 0.3, pageSize[1] * 0.3],
         })
+
+        // Logo Image
+        if (logo)
+          doc.image(logo, 0, pageSize[1] / 2 + 5, {
+            fit: [pageSize[0], 40],
+            align: "center",
+          })
+
         doc
           .fontSize(10)
           .text(

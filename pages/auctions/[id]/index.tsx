@@ -386,7 +386,9 @@ export default function EditAuctionPage() {
 
             <PrintableCardGenerator
               auctionEvent={event}
-              auctionItems={auctionItems}
+              auctionItems={auctionItems.filter((i) => {
+                return i.published
+              })}
             />
           </Box>
           <Divider sx={{ mb: 2 }} />

@@ -32,6 +32,7 @@ import AuctionItemCard from "../../../components/AuctionItemCard"
 import User from "../../../models/user"
 import AuctionEvent from "../../../models/AuctionEvent"
 import { signIn } from "next-auth/react"
+import PrintableCardGenerator from "../../../components/PrintableCardGenerator"
 
 export default function EditAuctionPage() {
   const imageInputRef = useRef() as React.MutableRefObject<HTMLInputElement>
@@ -43,13 +44,12 @@ export default function EditAuctionPage() {
   const [errorMessage, setErrorMessage] = useState("")
 
   const [event, setEvent] = useState<AuctionEvent>()
+  const [auctionItems, setAuctionItems] = useState<AuctionItem[]>([])
   const [isManager, setIsManager] = useState(false)
 
   const [selectedFile, setSelectedFile] = useState<File | null>()
   const [previewImage, setPreviewImage] = useState("")
   const [dataModified, setDataModified] = useState(false)
-
-  const [auctionItems, setAuctionItems] = useState<AuctionItem[]>([])
 
   const [collaboratorEmail, setCollaboratorEmail] = useState("")
   const [collaboratorError, setCollaboratorError] = useState("")
@@ -372,9 +372,23 @@ export default function EditAuctionPage() {
             </a>
           </Link>
 
-          <Typography variant="h5" component="h2" sx={{ mt: 6 }}>
-            Auction Items
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+            }}
+          >
+            <Typography variant="h5" component="h2" sx={{ mt: 6 }}>
+              Auction Items
+            </Typography>
+
+            <PrintableCardGenerator
+              auctionEvent={event}
+              auctionItems={auctionItems}
+            />
+          </Box>
           <Divider sx={{ mb: 2 }} />
           {!auctionItems.length && (
             <div>

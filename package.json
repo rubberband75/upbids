@@ -57,6 +57,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.17.1",
     "@types/bcryptjs": "^2.4.2",
     "@types/express": "^4.17.13",
     "@types/multer": "^1.4.7",

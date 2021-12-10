@@ -115,3 +115,5 @@ package-lock.json
 
 # PM2 Config
 ecosystem.config.js
+test-results/
+playwright-report/
